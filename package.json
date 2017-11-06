@@ -1,0 +1,19 @@
+{
+  "name": "grm-mobile",
+  "version": "1.0.0",
+  "description": "Javascript para Jquery Mobile",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geilsonrm/grm-mobile.git"
+  },
+  "author": "Geilson Ribeiro Mirandola",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geilsonrm/grm-mobile/issues"
+  },
+  "homepage": "https://github.com/geilsonrm/grm-mobile#readme"
+}

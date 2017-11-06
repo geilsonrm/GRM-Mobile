@@ -1,0 +1,13 @@
+
+		body {
+			margin: 0 auto !important;
+			padding-bottom: 20px !important;
+			padding-top: 	0px !important;			
+			overflow: hidden !important;
+		}
+
+		#map_div {
+			position: absolute;
+			width: 100% !important;		
+			height: 100% !important;	
+		}
