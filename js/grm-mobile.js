@@ -64,6 +64,21 @@ class Mobile {
         return this.setLastElement(component, 'header');
     }
 
+    footer(p = {}) {
+        p.append = p.append ? p.append : this.getLastElement('page');
+        p.id = p.id ? p.id : createID('footer');        
+        var component =
+        `
+        <div data-role="footer" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} data-position="fixed" >
+            <h1>${p.heading || '&nbsp;'}</h1>
+        </div>
+        `
+        component = removeUndefined(component);
+        component = $(component)
+        p.append.append(component);
+        return this.setLastElement(component, 'header');
+    }
+
 
     button(p = {}) {
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
@@ -72,11 +87,15 @@ class Mobile {
         p.newWindow = p.newWindow ? '"_blank"' : undefined;
         p.rel = p.rel ? '"back"' : undefined;
         p.href = p.href ? "#" + p.href : '"#"';
+        if(!p.text && !p.icon) {
+            p.text = 'Button'
+            p.icon = 'star'
+        }
         var component =
-        `
+        `        
         <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} 
-        target=${p.newWindow} data-inline=${p.line} data-direction=${p.reverse} 
-        data-rel=${p.rel} data-transition=${p.transition} href=${p.href}>${p.text || '&nbsp;'}</a>
+        target=${p.newWindow} data-inline=${p.line} data-direction=${p.reverse} data-rel=${p.rel} 
+        data-icon=${p.icon} data-iconpos=${p.iconpos} data-transition=${p.transition} href=${p.href}>${p.text || '&nbsp;'}</a>
         
         `
         return this.finalizy(component, p);
@@ -148,7 +167,8 @@ const mobile = new Mobile()
 
 mobile.page()
 mobile.header()
-mobile.button({text:'Button'})
+mobile.footer({heading:'rodapé'})
+mobile.button()
 mobile.input({title:'Label'})
 mobile.area({title:'Label'})
 mobile.heading({text:'NODE.JS'})
@@ -200,6 +220,8 @@ function removeUndefined(p) {
     p = p.replace('placeholder=undefined', '');
     p = p.replace('value=undefined', 'value=""');
     p = p.replace('name=undefined', 'name=""');
+    p = p.replace('data-icon=undefined', '');
+    p = p.replace('data-iconpos=undefined', '');
     p = p.replace('>undefined<', '><');
     return p
 }
