@@ -82,7 +82,8 @@ class Mobile {
 
     button(p = {}) {
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        p.id = p.id ? p.id : createID('button');        
+        p.id = p.id ? p.id : createID('button');       
+        p.theme = p.theme ? p.theme : this.theme;        
         p.reverse = p.reverse ? '"reverse"' : undefined;
         p.newWindow = p.newWindow ? '"_blank"' : undefined;
         p.rel = p.rel ? '"back"' : undefined;
@@ -93,7 +94,7 @@ class Mobile {
         }
         var component =
         `        
-        <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} 
+        <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme} 
         target=${p.newWindow} data-inline=${p.line} data-direction=${p.reverse} data-rel=${p.rel} 
         data-icon=${p.icon} data-iconpos=${p.iconpos} data-transition=${p.transition} href=${p.href}>${p.text || '&nbsp;'}</a>
         
@@ -153,6 +154,26 @@ class Mobile {
         return this.finalizy(component, p);
     }
 
+    toggleSwitch(p = {}) {
+        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+        p.id = p.id ? p.id : createID('toggleswitch');        
+        p.name = p.name ? p.name : p.id;        
+        p.theme = p.theme ? p.theme : this.theme;
+        p.textOff = p.textOff ? p.textOff : 'off';
+        p.textOn = p.textOn ? p.textOn : 'on';
+        var component =
+        `
+        <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
+            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
+            <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
+                <option value="off">${p.textOff}</option>
+                <option value="on">${p.textOn}</option>
+            </select>
+        </div>
+    `
+        return this.finalizy(component, p);
+    }
+
 
 }
 
@@ -163,19 +184,19 @@ const p = {
     title: 'obs'
 }
 
-const mobile = new Mobile()
+const mobile = new Mobile('b')
 
 mobile.page()
 mobile.header()
-mobile.footer({heading:'rodapé'})
+mobile.footer()
 mobile.button()
-mobile.input({title:'Label'})
-mobile.area({title:'Label'})
-mobile.heading({text:'NODE.JS'})
-mobile.link({href:'page2'})
+mobile.input()
+mobile.area()
+mobile.heading()
+mobile.link()
+mobile.toggleSwitch({title:'ativo'})
+mobile.toggleSwitch({mini:true})
 
-mobile.page()
-mobile.header()
 
 
 
@@ -222,6 +243,7 @@ function removeUndefined(p) {
     p = p.replace('name=undefined', 'name=""');
     p = p.replace('data-icon=undefined', '');
     p = p.replace('data-iconpos=undefined', '');
+    p = p.replace('data-mini=undefined', '');
     p = p.replace('>undefined<', '><');
     return p
 }
