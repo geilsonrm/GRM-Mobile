@@ -19,7 +19,7 @@ class Mobile {
     finalizy(component, p) {
         // remove atributos undefined
         component = removeUndefined(component);
-        console.info(component)
+        // console.info(component)
         // converte string em seletor jQuery
         component = $(component)
         // insere element no destino informado por p.append
@@ -112,7 +112,6 @@ class Mobile {
         <div data-role="fieldcontain" data-controltype="textinput" class=${p._class}>
             ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
             <input name=${p.name} id=${p.id} placeholder=${p.placeholder} value=${p.value} type=${p.type}>
-        </div>
         `
         return this.finalizy(component, p);
     }
@@ -125,7 +124,6 @@ class Mobile {
         <div data-role="fieldcontain" data-controltype="textarea" class=${p._class}>
             ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
             <textarea name=${p.name} id=${p.id} placeholder=${p.placeholder} type=${p.type}>${p.value}</textarea>
-        </div>
         `
         return this.finalizy(component, p);
     }
@@ -154,25 +152,25 @@ class Mobile {
         return this.finalizy(component, p);
     }
 
-    toggleSwitch(p = {}) {
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        p.id = p.id ? p.id : createID('toggleswitch');        
-        p.name = p.name ? p.name : p.id;        
-        p.theme = p.theme ? p.theme : this.theme;
-        p.textOff = p.textOff ? p.textOff : 'off';
-        p.textOn = p.textOn ? p.textOn : 'on';
-        var component =
-        `
-        <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
-            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
-                <option value="off">${p.textOff}</option>
-                <option value="on">${p.textOn}</option>
-            </select>
-        </div>
-    `
-        return this.finalizy(component, p);
-    }
+    // toggleSwitch(p = {}) {
+    //     p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+    //     p.id = p.id ? p.id : createID('toggleswitch');        
+    //     p.name = p.name ? p.name : p.id;        
+    //     p.theme = p.theme ? p.theme : this.theme;
+    //     p.textOff = p.textOff ? p.textOff : 'off';
+    //     p.textOn = p.textOn ? p.textOn : 'on';
+    //     var component =
+    //     `
+    //     <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
+    //         ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
+    //         <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
+    //             <option value="off">${p.textOff}</option>
+    //             <option value="on">${p.textOn}</option>
+    //         </select>
+    //     </div>
+    // `
+    //     return this.finalizy(component, p);
+    // }
 
     slider(p = {}) {
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
@@ -187,7 +185,6 @@ class Mobile {
             ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
             <input id=${p.id} type="range" name=${p.name} value=${p.value} min=${p.valueMin} max=${p.valueMax} data-highlight=${p.highlight}
             data-mini=${p.mini} data-theme=${p.theme} data-track-theme=${p.trackTheme}>
-        </div>
     `
         return this.finalizy(component, p);
     }
@@ -206,9 +203,34 @@ class Mobile {
             <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
                 <option value="off">${p.textOff}</option>
                 <option value="on">${p.textOn}</option>
-            </select>
-        </div>
     `
+        return this.finalizy(component, p);
+    }
+
+    checkboxes(p = {}) {
+        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+        p.id = p.id ? p.id : createID('checkboxes');        
+        p.name = p.name ? p.name : p.id;        
+        p.theme = p.theme ? p.theme : this.theme;
+
+        var component =
+        `
+        <div id=${p.id} data-role="fieldcontain" data-controltype="checkboxes">
+            <fieldset data-role="controlgroup" data-type="vertical" data-mini="true">
+            ${p.title ? `<legend>${p.title}</legend>`: ''}
+                {ITENS}
+        `
+        var itens = "";
+        [1,2].forEach( (item,index)=> {
+            var item = 
+            `
+            <input id="checkbox${index+1}" name="NAME" data-theme="b" type="checkbox">
+            <label for="checkbox${index+1}">TEXT</label>
+            `
+            itens = itens.concat(item)
+        })
+        
+        component = component.replace('{ITENS}', itens)
         return this.finalizy(component, p);
     }
 
@@ -234,6 +256,7 @@ mobile.heading()
 mobile.link()
 mobile.toggleSwitch()
 mobile.slider()
+mobile.checkboxes()
 
 
 
