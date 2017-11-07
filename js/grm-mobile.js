@@ -15,6 +15,9 @@ class Mobile {
             p.heading = nameComponent;
             p.text = nameComponent;
             p.icon = 'star';
+            p.theme = 'b';   
+            p.trackTheme = 'b';
+            p.highlight = 'true';
         } 
         return p;
     }
@@ -23,15 +26,39 @@ class Mobile {
         // checa se o componente é demo
         // caso seja será atribuído valores de exemplo  
         this.isDemo(p, nameComponent);
+
         // checa atributos que receberão valor default
         // caso seja nulo será atribuído valor 
         if(arrayPropertys.indexOf('id') >= 0) 
-            // tudo minúsculo e remover espaços da string id
-            // let id = createID(nameComponent.toLocaleLowerCase().replace(/\s/g, "") );
             p.id = p.id ? p.id : createID(nameComponent);
-        if(arrayPropertys.indexOf('id') >= 0) 
-
-        if(arrayPropertys.indexOf('id') >= 0) 
+        if(arrayPropertys.indexOf('theme') >= 0) 
+            p.theme = p.theme ? p.theme : this.theme;        
+        if(arrayPropertys.indexOf('trackTheme') >= 0) 
+            p.trackTheme = p.trackTheme ? p.trackTheme : this.theme;        
+        if(arrayPropertys.indexOf('reverse') >= 0) 
+            p.reverse = p.reverse ? '"reverse"' : undefined;
+        if(arrayPropertys.indexOf('newWindow') >= 0) 
+            p.newWindow = p.newWindow ? '"_blank"' : undefined;
+        if(arrayPropertys.indexOf('rel') >= 0) 
+            p.rel = p.rel ? '"back"' : undefined;
+        if(arrayPropertys.indexOf('href') >= 0) 
+            p.href = p.href ? "#" + p.href : '"#"';
+        if(arrayPropertys.indexOf('type') >= 0) 
+            p.type = p.type ? p.type : 'text';
+        if(arrayPropertys.indexOf('size') >= 0)             
+            p.size = p.size ? p.size : 1;
+        if(arrayPropertys.indexOf('placeholder') >= 0)
+            p.placeholder = p.placeholder ? p.placeholder : "Digite aqui";          
+        // if(arrayPropertys.indexOf('size') >= 0)             
+            
+        // define append do componente
+        if(['Page'].indexOf(nameComponent) >= 0) {
+            p.append = p.append ? p.append : $('body');
+        } else if( ['Header','Footer'].indexOf(nameComponent) >= 0) {
+            p.append = p.append ? p.append : this.getLastElement('page');
+        } else {
+            p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+        }
         
         return p;
     }
@@ -64,11 +91,10 @@ class Mobile {
     // }
 
     page(p = {}) {
-        this.propertyIsNullOrDemo(p, 'page', ['segunda','text'])
-        p.append = p.append ? p.append : $('body');
+        this.propertyIsNullOrDemo(p, 'Page', ['id'])        
         var component =
         `
-        <div data-role="page" id=${p.id} class=${p._class} data-theme=${p.theme || 'c'} data-control-title=${p.title} >
+        <div data-role="page" id=${p.id} class=${p._class} data-theme=${p.theme} data-control-title=${p.title} >
             <div data-role="content" style="padding: px"></div>
         </div>
         `
@@ -79,9 +105,7 @@ class Mobile {
     }
 
     header(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Header', ['id']);
-        p.append = p.append ? p.append : this.getLastElement('page');
-        // p.id = p.id ? p.id : createID('header');        
+        this.propertyIsNullOrDemo(p, 'Header', ['id','theme']);
         var component =
         `
         <div data-role="header" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} >
@@ -96,8 +120,7 @@ class Mobile {
     }
 
     footer(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Footer', ['id']);       
-        p.append = p.append ? p.append : this.getLastElement('page');
+        this.propertyIsNullOrDemo(p, 'Footer', ['id','theme']);  
         var component =
         `
         <div data-role="footer" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} data-position="fixed" >
@@ -112,13 +135,7 @@ class Mobile {
 
 
     button(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Button', ['id']);       
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        p.theme = p.theme ? p.theme : this.theme;        
-        p.reverse = p.reverse ? '"reverse"' : undefined;
-        p.newWindow = p.newWindow ? '"_blank"' : undefined;
-        p.rel = p.rel ? '"back"' : undefined;
-        p.href = p.href ? "#" + p.href : '"#"';
+        this.propertyIsNullOrDemo(p, 'Button', ['id','theme', 'reverse', 'newWindow', 'rel', 'href']);         
         var component =
         `        
         <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme} 
@@ -130,10 +147,8 @@ class Mobile {
         
     }
 
-    input(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Text input', ['id']);              
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        p.type = p.type ? p.type : 'text';
+    textinput(p = {}) {
+        this.propertyIsNullOrDemo(p, 'Text input', ['id', 'theme', 'type', 'placeholder']);
         var component =
         `
         <div data-role="fieldcontain" data-controltype="textinput" class=${p._class}>
@@ -143,9 +158,8 @@ class Mobile {
         return this.finalizy(component, p);
     }
 
-    area(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Text area', ['id']);
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+    textarea(p = {}) {
+        this.propertyIsNullOrDemo(p, 'Text area', ['id', 'theme', 'placeholder']);
         var component =
         `
         <div data-role="fieldcontain" data-controltype="textarea" class=${p._class}>
@@ -156,9 +170,7 @@ class Mobile {
     }
 
     heading(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Heading', ['id']);
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        p.size = p.size ? p.size : 1;
+        this.propertyIsNullOrDemo(p, 'Heading', ['id', 'theme', 'size' ]);
         var component =
         `
         <h${p.size} id=${p.id} class=${p._class}>${p.text}</h${p.size}>
@@ -167,79 +179,42 @@ class Mobile {
     }
 
     link(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Link', ['id']);   
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        p.newWindow = p.newWindow ? '"_blank"' : undefined;
-        p.text = p.text ? p.text : 'Link';
-        p.href = p.href ? "#" + p.href : '"#"';
+        this.propertyIsNullOrDemo(p, 'Link', ['id', 'theme', 'newWindow', 'href']);
         var component =
         `
-        <a id=${p.id} class=${p._class} target=${p.newWindow} data-transition=${p.transition} href=${p.href}>${p.text}</a>
+        <a id=${p.id} class=${p._class} target=${p.newWindow} data-transition=${p.transition} href=${p.href}>${p.text||Link}</a>
         `
         return this.finalizy(component, p);
     }
 
-    // toggleSwitch(p = {}) {
-    //     p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-    //     p.id = p.id ? p.id : createID('toggleswitch');        
-    //     p.name = p.name ? p.name : p.id;        
-    //     p.theme = p.theme ? p.theme : this.theme;
-    //     p.textOff = p.textOff ? p.textOff : 'off';
-    //     p.textOn = p.textOn ? p.textOn : 'on';
-    //     var component =
-    //     `
-    //     <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
-    //         ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-    //         <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
-    //             <option value="off">${p.textOff}</option>
-    //             <option value="on">${p.textOn}</option>
-    //         </select>
-    //     </div>
-    // `
-    //     return this.finalizy(component, p);
-    // }
-
     slider(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Slider', ['id']);
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');       
-        p.theme = p.theme ? p.theme : this.theme;
-        p.value = p.value ? p.value : 50;
-        p.valueMin = p.valueMin ? p.valueMin : 0;
-        p.valueMax = p.valueMax ? p.valueMax : 100;
+        this.propertyIsNullOrDemo(p, 'Slider', ['id', 'theme', 'trackTheme']);   
         var component =
         `
         <div data-role="fieldcontain" data-controltype="slider" class=${p._class}>
             ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <input id=${p.id} type="range" name=${p.name} value=${p.value} min=${p.valueMin} max=${p.valueMax} data-highlight=${p.highlight}
-            data-mini=${p.mini} data-theme=${p.theme} data-track-theme=${p.trackTheme}>
-    `
+            <input id=${p.id} type="range" name=${p.name} value=${p.value||50} min=${p.valueMin||0} max=${p.valueMax||100}
+            data-highlight=${p.highlight} data-mini=${p.mini} data-theme=${p.theme} data-track-theme=${p.trackTheme}>
+        `
         return this.finalizy(component, p);
     }
 
     toggleSwitch(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Toggle Switch', ['id']);
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');     
-        p.name = p.name ? p.name : p.id;        
-        p.theme = p.theme ? p.theme : this.theme;
-        p.textOff = p.textOff ? p.textOff : 'off';
-        p.textOn = p.textOn ? p.textOn : 'on';
+        this.propertyIsNullOrDemo(p, 'Toggle Switch', ['id', 'theme', ]);
         var component =
         `
         <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
             ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
-                <option value="off">${p.textOff}</option>
-                <option value="on">${p.textOn}</option>
-    `
+            <select name=${p.name||p.id} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
+                <option value="off">${p.textOff||"off"}</option>
+                <option value="on">${p.textOn||"on"}</option>
+        `
         return this.finalizy(component, p);
     }
 
     checkboxes(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Checkboxes', ['id']);
-        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');     
+        this.propertyIsNullOrDemo(p, 'Checkboxes', ['id','theme']);  
         p.name = p.name ? p.name : p.id;        
-        p.theme = p.theme ? p.theme : this.theme;
-
         var component =
         `
         <div id=${p.id} data-role="fieldcontain" data-controltype="checkboxes">
@@ -264,21 +239,15 @@ class Mobile {
 
 }
 
-const p = {
-    placeholder: 'nome',
-    value: 'Geilson',
-    type: 'password',
-    title: 'obs'
-}
 
-const mobile = new Mobile('b')
+const mobile = new Mobile('e')
 
-mobile.page()
+mobile.page({theme:'c'})
 mobile.header()
 mobile.footer()
 mobile.button()
-mobile.input()
-mobile.area()
+mobile.textinput()
+mobile.textarea()
 mobile.heading()
 mobile.link()
 mobile.toggleSwitch()
@@ -330,6 +299,7 @@ function removeUndefined(p) {
     p = p.replace('data-inline=undefined', '');
     p = p.replace('data-direction=undefined', '');
     p = p.replace('data-transition=undefined', '');
+    p = p.replace('data-highlight=undefined', '');
     p = p.replace('placeholder=undefined', '');
     p = p.replace('value=undefined', 'value=""');
     p = p.replace('name=undefined', 'name=""');
