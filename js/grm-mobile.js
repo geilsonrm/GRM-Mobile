@@ -1,9 +1,30 @@
 
+
+
 class Mobile {
 
     constructor(theme) {
         this.theme = theme || 'b';
         this.lastElements = [];
+    }
+
+    isDemo(p, nameComponent) {
+        const pIsUndefined = Object.keys(p)[0] == undefined;
+        if(pIsUndefined) {
+            p.title = nameComponent;
+            p.heading = nameComponent;
+            p.text = nameComponent;
+            p.icon = 'star';
+        } 
+        return p;
+    }
+
+    propertyIsNull(p, nameComponent, arrayPropertys) {
+        console.log()
+        // if(arrayPropertys.indexOf('text') < 0)
+        if(arrayPropertys.indexOf('id') >= 0) p.id = p.id ? p.id : createID(nameComponent);
+
+
     }
 
     setLastElement(element, name) {
@@ -34,6 +55,7 @@ class Mobile {
     // }
 
     page(p = {}) {
+        this.propertyIsNull(p, 'page', ['segunda','text'])
         p.append = p.append ? p.append : $('body');
         p.id = p.id ? p.id : createID('page');        
         var component =
@@ -49,8 +71,10 @@ class Mobile {
     }
 
     header(p = {}) {
+        this.isDemo(p, 'Header');       
+        this.propertyIsNull(p, 'header', ['id']);  
         p.append = p.append ? p.append : this.getLastElement('page');
-        p.id = p.id ? p.id : createID('header');        
+        // p.id = p.id ? p.id : createID('header');        
         var component =
         `
         <div data-role="header" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} >
@@ -65,6 +89,7 @@ class Mobile {
     }
 
     footer(p = {}) {
+        this.isDemo(p, 'Footer');        
         p.append = p.append ? p.append : this.getLastElement('page');
         p.id = p.id ? p.id : createID('footer');        
         var component =
@@ -81,6 +106,7 @@ class Mobile {
 
 
     button(p = {}) {
+        this.isDemo(p, 'Button');        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('button');       
         p.theme = p.theme ? p.theme : this.theme;        
@@ -88,10 +114,6 @@ class Mobile {
         p.newWindow = p.newWindow ? '"_blank"' : undefined;
         p.rel = p.rel ? '"back"' : undefined;
         p.href = p.href ? "#" + p.href : '"#"';
-        if(!p.text && !p.icon) {
-            p.text = 'Button'
-            p.icon = 'star'
-        }
         var component =
         `        
         <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme} 
@@ -104,6 +126,7 @@ class Mobile {
     }
 
     input(p = {}) {
+        this.isDemo(p, 'Text Input');        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('textinput');
         p.type = p.type ? p.type : 'text';
@@ -117,6 +140,8 @@ class Mobile {
     }
 
     area(p = {}) {
+        this.isDemo(p, 'Text Area');
+        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('textarea');
         var component =
@@ -129,6 +154,7 @@ class Mobile {
     }
 
     heading(p = {}) {
+        this.isDemo(p, 'Heading');        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('heading');
         p.size = p.size ? p.size : 1;
@@ -140,6 +166,7 @@ class Mobile {
     }
 
     link(p = {}) {
+        this.isDemo(p, 'Link');        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('link');        
         p.newWindow = p.newWindow ? '"_blank"' : undefined;
@@ -173,6 +200,7 @@ class Mobile {
     // }
 
     slider(p = {}) {
+        this.isDemo(p, 'Slider');
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('slider');        
         p.theme = p.theme ? p.theme : this.theme;
@@ -190,6 +218,7 @@ class Mobile {
     }
 
     toggleSwitch(p = {}) {
+        this.isDemo(p, 'Toggle Switch');        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('toggleswitch');        
         p.name = p.name ? p.name : p.id;        
@@ -208,6 +237,7 @@ class Mobile {
     }
 
     checkboxes(p = {}) {
+        this.isDemo(p, 'Checkboxes');        
         p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         p.id = p.id ? p.id : createID('checkboxes');        
         p.name = p.name ? p.name : p.id;        
@@ -263,6 +293,8 @@ mobile.checkboxes()
 
 
 
+
+ 
 
 
 
