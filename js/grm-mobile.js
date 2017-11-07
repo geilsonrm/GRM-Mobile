@@ -174,6 +174,44 @@ class Mobile {
         return this.finalizy(component, p);
     }
 
+    slider(p = {}) {
+        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+        p.id = p.id ? p.id : createID('slider');        
+        p.theme = p.theme ? p.theme : this.theme;
+        p.value = p.value ? p.value : 50;
+        p.valueMin = p.valueMin ? p.valueMin : 0;
+        p.valueMax = p.valueMax ? p.valueMax : 100;
+        var component =
+        `
+        <div data-role="fieldcontain" data-controltype="slider" class=${p._class}>
+            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
+            <input id=${p.id} type="range" name=${p.name} value=${p.value} min=${p.valueMin} max=${p.valueMax} data-highlight=${p.highlight}
+            data-mini=${p.mini} data-theme=${p.theme} data-track-theme=${p.trackTheme}>
+        </div>
+    `
+        return this.finalizy(component, p);
+    }
+
+    toggleSwitch(p = {}) {
+        p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+        p.id = p.id ? p.id : createID('toggleswitch');        
+        p.name = p.name ? p.name : p.id;        
+        p.theme = p.theme ? p.theme : this.theme;
+        p.textOff = p.textOff ? p.textOff : 'off';
+        p.textOn = p.textOn ? p.textOn : 'on';
+        var component =
+        `
+        <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
+            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
+            <select name=${p.name} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
+                <option value="off">${p.textOff}</option>
+                <option value="on">${p.textOn}</option>
+            </select>
+        </div>
+    `
+        return this.finalizy(component, p);
+    }
+
 
 }
 
@@ -194,8 +232,8 @@ mobile.input()
 mobile.area()
 mobile.heading()
 mobile.link()
-mobile.toggleSwitch({title:'ativo'})
-mobile.toggleSwitch({mini:true})
+mobile.toggleSwitch()
+mobile.slider()
 
 
 
