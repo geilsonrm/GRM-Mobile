@@ -3,9 +3,10 @@
 
 class Mobile {
 
-    constructor(theme) {
-        this.theme = theme || 'b';
+    constructor(p ={}) {
+        this.theme = "";
         this.lastElements = [];
+        this.itens = [];
     }
 
     isDemo(p, nameComponent) {
@@ -15,9 +16,11 @@ class Mobile {
             p.heading = nameComponent;
             p.text = nameComponent;
             p.icon = 'star';
-            p.theme = 'b';   
+            p.theme = this.theme;   
             p.trackTheme = 'b';
             p.highlight = 'true';
+            p.name = createID(nameComponent);
+            p.native = 'false';
         } 
         return p;
     }
@@ -31,26 +34,43 @@ class Mobile {
         // caso seja nulo será atribuído valor 
         if(arrayPropertys.indexOf('id') >= 0) 
             p.id = p.id ? p.id : createID(nameComponent);
+
         if(arrayPropertys.indexOf('theme') >= 0) 
-            p.theme = p.theme ? p.theme : this.theme;        
+            p.theme = p.theme ? p.theme : this.theme;      
+
         if(arrayPropertys.indexOf('trackTheme') >= 0) 
-            p.trackTheme = p.trackTheme ? p.trackTheme : this.theme;        
+            p.trackTheme = p.trackTheme ? p.trackTheme : this.theme;   
+
         if(arrayPropertys.indexOf('reverse') >= 0) 
             p.reverse = p.reverse ? '"reverse"' : undefined;
+
         if(arrayPropertys.indexOf('newWindow') >= 0) 
             p.newWindow = p.newWindow ? '"_blank"' : undefined;
+
         if(arrayPropertys.indexOf('rel') >= 0) 
             p.rel = p.rel ? '"back"' : undefined;
+
         if(arrayPropertys.indexOf('href') >= 0) 
             p.href = p.href ? "#" + p.href : '"#"';
+
         if(arrayPropertys.indexOf('type') >= 0) 
             p.type = p.type ? p.type : 'text';
+
         if(arrayPropertys.indexOf('size') >= 0)             
             p.size = p.size ? p.size : 1;
+
         if(arrayPropertys.indexOf('placeholder') >= 0)
-            p.placeholder = p.placeholder ? p.placeholder : "Digite aqui";          
-        // if(arrayPropertys.indexOf('size') >= 0)             
-            
+            p.placeholder = p.placeholder ? p.placeholder : "Digite aqui";   
+
+        if(arrayPropertys.indexOf('transition') >= 0)
+            p.transition = p.transition ? p.transition : "flow";
+
+        if(arrayPropertys.indexOf('orientation') >= 0)             
+            p.orientation = p.orientation ? p.orientation : "vertical";        
+        
+        if(arrayPropertys.indexOf('native') >= 0)             
+            p.native = p.native ? p.native : "false";   
+
         // define append do componente
         if(['Page'].indexOf(nameComponent) >= 0) {
             p.append = p.append ? p.append : $('body');
@@ -76,7 +96,7 @@ class Mobile {
     finalizy(component, p) {
         // remove atributos undefined
         component = removeUndefined(component);
-        // console.info(component)
+        console.info(component)
         // converte string em seletor jQuery
         component = $(component)
         // insere element no destino informado por p.append
@@ -91,12 +111,13 @@ class Mobile {
     // }
 
     page(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Page', ['id'])        
+        this.theme = p.theme ? p.theme : 'b';
+        this.propertyIsNullOrDemo(p, 'Page', ['id', 'theme']);
         var component =
         `
-        <div data-role="page" id=${p.id} class=${p._class} data-theme=${p.theme} data-control-title=${p.title} >
-            <div data-role="content" style="padding: px"></div>
-        </div>
+        <div data-role="page" id=${p.id} class=${p._class} data-control-title=${p.title} data-theme=${p.theme} >
+            <div data-role="content">
+   
         `
         component = removeUndefined(component);
         component = $(component)
@@ -109,7 +130,7 @@ class Mobile {
         var component =
         `
         <div data-role="header" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} >
-            <h1>${p.heading || '&nbsp;'}</h1>
+            <h1>${p.text || '&nbsp;'}</h1>
             <a href="#info" data-rel="popup" class="ui-btn ui-btn-icon-notext ui-icon-info ui-btn-b ui-corner-all ui-btn-right"></a>
         </div>
         `
@@ -124,7 +145,7 @@ class Mobile {
         var component =
         `
         <div data-role="footer" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} data-position="fixed" >
-            <h1>${p.heading || '&nbsp;'}</h1>
+            <h1>${p.text || '&nbsp;'}</h1>
         </div>
         `
         component = removeUndefined(component);
@@ -135,7 +156,7 @@ class Mobile {
 
 
     button(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Button', ['id','theme', 'reverse', 'newWindow', 'rel', 'href']);         
+        this.propertyIsNullOrDemo(p, 'Button', ['id','theme', 'reverse', 'newWindow', 'rel', 'transition', 'href']);         
         var component =
         `        
         <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme} 
@@ -144,11 +165,10 @@ class Mobile {
         
         `
         return this.finalizy(component, p);
-        
     }
 
     textinput(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Text input', ['id', 'theme', 'type', 'placeholder']);
+        this.propertyIsNullOrDemo(p, 'Text Input', ['id', 'theme', 'type', 'placeholder']);
         var component =
         `
         <div data-role="fieldcontain" data-controltype="textinput" class=${p._class}>
@@ -159,7 +179,7 @@ class Mobile {
     }
 
     textarea(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Text area', ['id', 'theme', 'placeholder']);
+        this.propertyIsNullOrDemo(p, 'Text Area', ['id', 'theme', 'placeholder']);
         var component =
         `
         <div data-role="fieldcontain" data-controltype="textarea" class=${p._class}>
@@ -212,47 +232,135 @@ class Mobile {
         return this.finalizy(component, p);
     }
 
+    addItem(p = {}) {
+        this.itens.push(p);
+        return this.itens;
+    }
+
     checkboxes(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Checkboxes', ['id','theme']);  
+        this.item = new Itens();
+        this.propertyIsNullOrDemo(p, 'Check Boxes', ['id', 'theme', 'orientation']);  
         p.name = p.name ? p.name : p.id;        
         var component =
         `
         <div id=${p.id} data-role="fieldcontain" data-controltype="checkboxes">
-            <fieldset data-role="controlgroup" data-type="vertical" data-mini="true">
+            <fieldset data-role="controlgroup" data-type=${p.orientation} data-mini=${p.mini}>
             ${p.title ? `<legend>${p.title}</legend>`: ''}
                 {ITENS}
         `
-        var itens = "";
-        [1,2].forEach( (item,index)=> {
+        var itens = '';
+        this.itens.forEach( (item,index)=> {
+            item = this.isDemo(item, 'item');
             var item = 
             `
-            <input id="checkbox${index+1}" name="NAME" data-theme="b" type="checkbox">
-            <label for="checkbox${index+1}">TEXT</label>
+            <input  id="${p.id}-item${index+1}" name=${item.name} data-theme=${item.theme} type="checkbox">
+            <label for="${p.id}-item${index+1}">${item.text}</label>
             `
             itens = itens.concat(item)
         })
-        
         component = component.replace('{ITENS}', itens)
+        this.itens = [];
         return this.finalizy(component, p);
     }
 
+    radiobuttons(p = {}) {
+        this.item = new Itens();
+        this.propertyIsNullOrDemo(p, 'Radio Buttons', ['id', 'theme', 'orientation']);  
+        p.name = p.name ? p.name : p.id;        
+        var component =
+        `
+        <div id=${p.id} data-role="fieldcontain" data-controltype="radiobuttons">
+            <fieldset data-role="controlgroup" data-type=${p.orientation} data-mini=${p.mini}>
+            ${p.title ? `<legend>${p.title}</legend>`: ''}            
+                {ITENS}
+        `
+        var itens = '';
+        this.itens.forEach( (item,index)=> {
+            item = this.isDemo(item, 'item');
+            var item = 
+            `
+            <input  id="${p.id}-item${index+1}" name=${p.id} data-theme=${item.theme} type="radio">
+            <label for="${p.id}-item${index+1}">${item.text}</label>
+            `
+            itens = itens.concat(item)
+        })
+        component = component.replace('{ITENS}', itens)
+        this.itens = [];
+        return this.finalizy(component, p);
+    }
+
+    selectMenu(p = {}) {
+        this.item = new Itens();
+        this.propertyIsNullOrDemo(p, 'Select Menu', ['id', 'theme']);  
+        p.name = p.name ? p.name : p.id;        
+        var component =
+        `
+        <div data-role="fieldcontain" data-controltype="selectmenu" class=${p._class}>
+            ${p.title ? `<label for=${p.id} >${p.title}</label>`: ''}  
+            <select id=${p.id} data-native-menu=${p.native} name=${p.name} data-theme=${p.theme} data-mini=${p.mini}>
+                {ITENS}
+        `
+        var itens = '';
+        this.itens.forEach( (item,index)=> {
+            item = this.isDemo(item, 'item');
+            var item = 
+            `
+            <option value="${p.value||index}">${item.text}</option>
+            `
+            itens = itens.concat(item)
+        })
+        component = component.replace('{ITENS}', itens)
+        this.itens = [];
+        return this.finalizy(component, p);
+    }
 
 }
 
 
-const mobile = new Mobile('e')
+class Itens {
 
-mobile.page({theme:'c'})
-mobile.header()
-mobile.footer()
-mobile.button()
-mobile.textinput()
-mobile.textarea()
-mobile.heading()
-mobile.link()
-mobile.toggleSwitch()
-mobile.slider()
-mobile.checkboxes()
+    constructor() {
+
+    }
+
+    setItem() {
+
+    }
+
+    getItem() {
+        return 'OI'
+    }
+}
+
+
+
+
+
+
+
+
+
+// var mobile = new Mobile('e')
+
+// mobile.page({theme:'d'})
+// mobile.header()
+// mobile.footer()
+// mobile.button()
+// mobile.textinput()
+// mobile.textarea()
+// mobile.heading()
+// mobile.link()
+// mobile.toggleSwitch()
+// mobile.slider()
+// mobile.checkboxes()
+// mobile.button({transition:'flow', text:'Mirandola', icon:'gear', iconpos:'right', href:'page3'})
+
+
+
+// mobile.page({theme:'c'})
+// mobile.header()
+// mobile.button({text:'Voltar', rel:true})
+// mobile.heading({text:'Page 2'})
 
 
 
@@ -305,6 +413,7 @@ function removeUndefined(p) {
     p = p.replace('name=undefined', 'name=""');
     p = p.replace('data-icon=undefined', '');
     p = p.replace('data-iconpos=undefined', '');
+    p = p.replace('data-native-menu=undefined', '');
     p = p.replace('data-mini=undefined', '');
     p = p.replace('>undefined<', '><');
     return p
