@@ -1,4 +1,11 @@
-
+String.prototype.replaceAll = function(searchStr, replaceStr) {
+    var str = this;
+    
+    // escape regexp special characters in search string
+    searchStr = searchStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    
+    return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
+};
 
 
 class Mobile {
@@ -9,26 +16,35 @@ class Mobile {
         this.itens = [];
     }
 
-    isDemo(p, nameComponent) {
+    isDemo(p, nameComponent, index) {
         const pIsUndefined = Object.keys(p)[0] == undefined;
         if(pIsUndefined) {
             p.title = nameComponent;
             p.heading = nameComponent;
             p.text = nameComponent;
             p.icon = 'star';
-            p.theme = this.theme;   
             p.trackTheme = 'b';
             p.highlight = 'true';
-            p.name = createID(nameComponent);
             p.native = 'false';
+            p.name = createID(nameComponent);
+            p.bubble = Math.floor((Math.random() * 200) + 1);
+            p.theme = nameComponent == 'item' ? 'c' : this.theme;   
+            p.text = nameComponent == 'item' ? `${nameComponent} ${index+1}` : nameComponent;
+            var itens = this.itens;
+            if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0
+               && this.itens.length <= 0) {
+                this.addItem([{},{},{}])
+                if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
+            } 
         } 
         return p;
     }
 
-    propertyIsNullOrDemo(p, nameComponent, arrayPropertys = []) {
+    propertyIsNullOrDemo(p, nameComponent, arrayPropertys = [], index) {
+        // p.itens = ''
         // checa se o componente é demo
         // caso seja será atribuído valores de exemplo  
-        this.isDemo(p, nameComponent);
+        this.isDemo(p, nameComponent, index);
 
         // checa atributos que receberão valor default
         // caso seja nulo será atribuído valor 
@@ -94,14 +110,17 @@ class Mobile {
     }
 
     finalizy(component, p) {
+        // concatena itens ao componente
+        component = component.replace('{ITENS}', p.itens)
         // remove atributos undefined
         component = removeUndefined(component);
-        console.info(component)
+        // console.info(component)
         // converte string em seletor jQuery
         component = $(component)
         // insere element no destino informado por p.append
         p.append.append(component);
-        this.setLastElement(component);        
+        this.setLastElement(component);     
+        this.itens = [];   
         return component;
     }
 
@@ -233,12 +252,18 @@ class Mobile {
     }
 
     addItem(p = {}) {
-        this.itens.push(p);
+        
+        if(!Array.isArray(p)) {
+            this.itens.push(p);
+        } else {
+            p.forEach( (item)=> {
+                this.itens.push(item);
+            })
+        }
         return this.itens;
     }
 
     checkboxes(p = {}) {
-        this.item = new Itens();
         this.propertyIsNullOrDemo(p, 'Check Boxes', ['id', 'theme', 'orientation']);  
         p.name = p.name ? p.name : p.id;        
         var component =
@@ -248,23 +273,21 @@ class Mobile {
             ${p.title ? `<legend>${p.title}</legend>`: ''}
                 {ITENS}
         `
-        var itens = '';
+        p.itens = '';
         this.itens.forEach( (item,index)=> {
-            item = this.isDemo(item, 'item');
+            this.propertyIsNullOrDemo(item, 'item', [], index);
+            item.theme = item.theme || 'c';
             var item = 
             `
             <input  id="${p.id}-item${index+1}" name=${item.name} data-theme=${item.theme} type="checkbox">
             <label for="${p.id}-item${index+1}">${item.text}</label>
             `
-            itens = itens.concat(item)
+            p.itens = p.itens.concat(item)
         })
-        component = component.replace('{ITENS}', itens)
-        this.itens = [];
         return this.finalizy(component, p);
     }
 
     radiobuttons(p = {}) {
-        this.item = new Itens();
         this.propertyIsNullOrDemo(p, 'Radio Buttons', ['id', 'theme', 'orientation']);  
         p.name = p.name ? p.name : p.id;        
         var component =
@@ -274,23 +297,21 @@ class Mobile {
             ${p.title ? `<legend>${p.title}</legend>`: ''}            
                 {ITENS}
         `
-        var itens = '';
+        p.itens = '';
         this.itens.forEach( (item,index)=> {
-            item = this.isDemo(item, 'item');
+            this.propertyIsNullOrDemo(item, 'item', [], index);
+            item.theme = item.theme || 'c';
             var item = 
             `
             <input  id="${p.id}-item${index+1}" name=${p.id} data-theme=${item.theme} type="radio">
             <label for="${p.id}-item${index+1}">${item.text}</label>
             `
-            itens = itens.concat(item)
+            p.itens = p.itens.concat(item)
         })
-        component = component.replace('{ITENS}', itens)
-        this.itens = [];
         return this.finalizy(component, p);
     }
 
     selectMenu(p = {}) {
-        this.item = new Itens();
         this.propertyIsNullOrDemo(p, 'Select Menu', ['id', 'theme']);  
         p.name = p.name ? p.name : p.id;        
         var component =
@@ -300,37 +321,85 @@ class Mobile {
             <select id=${p.id} data-native-menu=${p.native} name=${p.name} data-theme=${p.theme} data-mini=${p.mini}>
                 {ITENS}
         `
-        var itens = '';
+        p.itens = '';
         this.itens.forEach( (item,index)=> {
-            item = this.isDemo(item, 'item');
+            this.propertyIsNullOrDemo(item, 'item', [], index);
             var item = 
             `
             <option value="${p.value||index}">${item.text}</option>
             `
-            itens = itens.concat(item)
+            p.itens = p.itens.concat(item)
         })
-        component = component.replace('{ITENS}', itens)
-        this.itens = [];
+        return this.finalizy(component, p);
+    }
+
+    collapsible(p = {}) {
+        this.propertyIsNullOrDemo(p, 'Collapsible', ['id', 'theme']);  
+        p.name = p.name ? p.name : p.id;        
+        var component =
+        `
+        <div id=${p.id} data-role="collapsible-set" data-theme=${p.theme} data-content-theme=${p.themeContent||'b'} class=${p._class}>
+            {ITENS}
+        `
+        p.itens = '';
+        this.itens.forEach( (item,index)=> {
+            this.propertyIsNullOrDemo(item, 'item', [], index);
+            var item = 
+            `
+            <div id="${p.id}-item${index+1}" data-role="collapsible" data-collapsed=${item.collapsed||true}>
+                <h3>${item.text}</h3>
+            </div>
+            `
+            p.itens = p.itens.concat(item)
+        })
+        return this.finalizy(component, p);
+    }
+
+    listview(p = {}) {
+        this.propertyIsNullOrDemo(p, 'List View', ['id', 'theme']);  
+        p.name = p.name ? p.name : p.id;        
+        var component =
+        `
+        <ul id=${p.id} data-role="listview" data-divider-theme="b" data-inset="true" class=${p._class}>            
+            {ITENS}
+        `
+        p.itens = '';
+        this.itens.forEach( (item,index)=> {
+            // item.bubble = item.bubble || new Date().getMilliseconds()
+            if(!item.divider) {
+                this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
+                item.theme = item.theme || 'c';
+                // item = this.isDemo(item, 'item');
+                var item = 
+                `
+                <li data-theme=${item.theme}>
+                    <a href=${item.href} data-transition=${item.transition}>
+                        ${item.text}
+                        ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
+                    </a>
+                </li>
+                `
+            } else {
+                // this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
+                // item.theme = item.theme || 'b';
+                // item = this.isDemo(item, 'item');
+                var item = 
+                `
+                <li data-theme=${item.theme||'b'} data-role="list-divider" role="heading">
+                    ${item.text||'&nbsp;'}
+                    ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
+                `
+            }
+            p.itens += item
+            
+        })
+        
         return this.finalizy(component, p);
     }
 
 }
 
 
-class Itens {
-
-    constructor() {
-
-    }
-
-    setItem() {
-
-    }
-
-    getItem() {
-        return 'OI'
-    }
-}
 
 
 
@@ -400,24 +469,30 @@ function finalizy(component, p) {
 }
 
 function removeUndefined(p) {
-    p = p.replace('id=undefined', '');
-    p = p.replace('class=undefined', '');
-    p = p.replace('target=undefined', '');
-    p = p.replace('data-rel=undefined', '');
-    p = p.replace('data-inline=undefined', '');
-    p = p.replace('data-direction=undefined', '');
-    p = p.replace('data-transition=undefined', '');
-    p = p.replace('data-highlight=undefined', '');
-    p = p.replace('placeholder=undefined', '');
-    p = p.replace('value=undefined', 'value=""');
-    p = p.replace('name=undefined', 'name=""');
-    p = p.replace('data-icon=undefined', '');
-    p = p.replace('data-iconpos=undefined', '');
-    p = p.replace('data-native-menu=undefined', '');
-    p = p.replace('data-mini=undefined', '');
-    p = p.replace('>undefined<', '><');
+
+
+    p = p.replaceAll('id=undefined', '');
+    p = p.replaceAll('class=undefined', '');
+    p = p.replaceAll('target=undefined', '');
+    p = p.replaceAll('data-rel=undefined', '');
+    p = p.replaceAll('data-inline=undefined', '');
+    p = p.replaceAll('data-direction=undefined', '');
+    p = p.replaceAll('data-transition=undefined', '');
+    p = p.replaceAll('data-highlight=undefined', '');
+    p = p.replaceAll('placeholder=undefined', '');
+    p = p.replaceAll('value=undefined', 'value=""');
+    p = p.replaceAll('name=undefined', 'name=""');
+    p = p.replaceAll('data-icon=undefined', '');
+    p = p.replaceAll('data-iconpos=undefined', '');
+    p = p.replaceAll('data-native-menu=undefined', '');
+    p = p.replaceAll('data-mini=undefined', '');
+    p = p.replaceAll('>undefined<', '><');
     return p
 }
+
+
+
+
 
 
 function percorreJSON(obj) {
