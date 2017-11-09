@@ -1,17 +1,21 @@
 var mobile = new Mobile()
 
 mobile.page()
+mobile.panel()
+mobile.link({text:'panel', href:'aabb'})
 mobile.header()
 mobile.footer()
 mobile.button()
-
 
 mobile.textinput()
 mobile.textarea()
 mobile.slider()
 
-mobile.checkboxes()
-mobile.radiobuttons()
-mobile.selectMenu()
-mobile.collapsible()
-mobile.listview()
+// mobile.checkboxes({title:'check', theme:'e'})
+// mobile.radiobuttons({title:'radio', theme:'e'})
+// mobile.selectMenu({title:'selec', theme:'e'})
+// mobile.collapsible({title:'collap', theme:'e'})
+// mobile.addItem({text:'abc'})
+// mobile.addItem({divider:'abc'})
+// mobile.addItem({text:'abc'})
+// mobile.listview({title:'collap', themeDivider:'e'})

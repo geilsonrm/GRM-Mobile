@@ -30,12 +30,12 @@ class Mobile {
             p.bubble = Math.floor((Math.random() * 200) + 1);
             p.theme = nameComponent == 'item' ? 'c' : this.theme;   
             p.text = nameComponent == 'item' ? `${nameComponent} ${index+1}` : nameComponent;
-            var itens = this.itens;
-            if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0
-               && this.itens.length <= 0) {
-                this.addItem([{},{},{}])
-                if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
-            } 
+            // var itens = this.itens;
+            // if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0
+            //    && this.itens.length <= 0) {
+            //     this.addItem([{},{},{}])
+            //     if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
+            // } 
         } 
         return p;
     }
@@ -53,6 +53,9 @@ class Mobile {
 
         if(arrayPropertys.indexOf('theme') >= 0) 
             p.theme = p.theme ? p.theme : this.theme;      
+
+        // if(arrayPropertys.indexOf('inset') >= 0) 
+        //     p.inset = p.inset || true;      
 
         if(arrayPropertys.indexOf('trackTheme') >= 0) 
             p.trackTheme = p.trackTheme ? p.trackTheme : this.theme;   
@@ -90,12 +93,17 @@ class Mobile {
         // define append do componente
         if(['Page'].indexOf(nameComponent) >= 0) {
             p.append = p.append ? p.append : $('body');
-        } else if( ['Header','Footer'].indexOf(nameComponent) >= 0) {
+        } else if( ['Header','Footer', 'Panel'].indexOf(nameComponent) >= 0) {
             p.append = p.append ? p.append : this.getLastElement('page');
         } else {
             p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         }
-        
+        var itens = this.itens;
+        if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0 && this.itens.length <= 0) {
+            this.addItem([{},{},{}])
+            if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
+        } 
+
         return p;
     }
 
@@ -118,6 +126,7 @@ class Mobile {
         // converte string em seletor jQuery
         component = $(component)
         // insere element no destino informado por p.append
+        console.info(`Component: ${p} | ID: ${p.id}`)
         p.append.append(component);
         this.setLastElement(component);     
         this.itens = [];   
@@ -256,9 +265,7 @@ class Mobile {
         if(!Array.isArray(p)) {
             this.itens.push(p);
         } else {
-            p.forEach( (item)=> {
-                this.itens.push(item);
-            })
+            p.forEach( item => this.itens.push(item) )
         }
         return this.itens;
     }
@@ -276,7 +283,7 @@ class Mobile {
         p.itens = '';
         this.itens.forEach( (item,index)=> {
             this.propertyIsNullOrDemo(item, 'item', [], index);
-            item.theme = item.theme || 'c';
+            item.theme = item.theme || p.theme || 'c';
             var item = 
             `
             <input  id="${p.id}-item${index+1}" name=${item.name} data-theme=${item.theme} type="checkbox">
@@ -300,7 +307,7 @@ class Mobile {
         p.itens = '';
         this.itens.forEach( (item,index)=> {
             this.propertyIsNullOrDemo(item, 'item', [], index);
-            item.theme = item.theme || 'c';
+            item.theme = item.theme || p.theme || 'c';
             var item = 
             `
             <input  id="${p.id}-item${index+1}" name=${p.id} data-theme=${item.theme} type="radio">
@@ -356,36 +363,31 @@ class Mobile {
     }
 
     listview(p = {}) {
-        this.propertyIsNullOrDemo(p, 'List View', ['id', 'theme']);  
+        this.propertyIsNullOrDemo(p, 'List View', ['id', 'theme', 'inset']);  
         p.name = p.name ? p.name : p.id;        
         var component =
         `
-        <ul id=${p.id} data-role="listview" data-divider-theme="b" data-inset="true" class=${p._class}>            
+        <ul id=${p.id} data-role="listview" data-divider-theme=${p.themeDivider||'b'} data-inset=${(!!p.inset)||true} class=${p._class}>            
             {ITENS}
         `
         p.itens = '';
         this.itens.forEach( (item,index)=> {
-            // item.bubble = item.bubble || new Date().getMilliseconds()
             if(!item.divider) {
                 this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
                 item.theme = item.theme || 'c';
-                // item = this.isDemo(item, 'item');
                 var item = 
                 `
                 <li data-theme=${item.theme}>
-                    <a href=${item.href} data-transition=${item.transition}>
+                    ${ !item.readOnly ? `<a href=${item.href} data-transition=${item.transition}>` : ''}
                         ${item.text}
                         ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
-                    </a>
+                    ${ !item.readOnly ? '</a>' : ''}
                 </li>
                 `
             } else {
-                // this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
-                // item.theme = item.theme || 'b';
-                // item = this.isDemo(item, 'item');
                 var item = 
                 `
-                <li data-theme=${item.theme||'b'} data-role="list-divider" role="heading">
+                <li data-role="list-divider" role="heading">
                     ${item.text||'&nbsp;'}
                     ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
                 `
@@ -396,6 +398,60 @@ class Mobile {
         
         return this.finalizy(component, p);
     }
+
+
+    
+    panel(p = {}) {
+        this.propertyIsNullOrDemo(p, 'Panel', ['id', 'theme', 'inset']);  
+        p.name = p.name ? p.name : p.id;        
+        var component =
+        `
+
+        <div data-role="panel" id="aabb" data-position="left" data-display="reveal" data-theme="a">
+            <ul data-role="listview" data-divider-theme="h" data-inset="false">
+                <li data-role="list-divider" role="heading">Divider</li>
+                <li data-theme="a"><a href="" data-transition="slide">Button</a></li>
+            </ul>
+        </div>
+        `
+        p.itens = '';
+        this.itens.forEach( (item,index)=> {
+            if(!item.divider) {
+                this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
+                item.theme = item.theme || 'c';
+                var item = 
+                `    <div data-role="panel" id="aabb" data-position="left" data-display="reveal"
+    data-theme="a">
+        <ul data-role="listview" data-divider-theme="h" data-inset="false">
+            <li data-role="list-divider" role="heading">
+                Divider
+            </li>
+            <li data-theme="a">
+                <a href="" data-transition="slide">
+                    Button
+                </a>
+            </li>
+        </ul>
+    </div>
+                `
+            } else {
+                var item = 
+                `
+                <li data-role="list-divider" role="heading">
+                    ${item.text||'&nbsp;'}
+                    ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
+                `
+            }
+            p.itens += item
+            
+        })
+        component = removeUndefined(component);
+        component = $(component)
+        p.append.prepend(component);
+        return this.setLastElement(component, 'header');
+        // return this.finalizy(component, p);
+    }
+
 
 }
 
@@ -486,6 +542,7 @@ function removeUndefined(p) {
     p = p.replaceAll('data-iconpos=undefined', '');
     p = p.replaceAll('data-native-menu=undefined', '');
     p = p.replaceAll('data-mini=undefined', '');
+    p = p.replaceAll('data-inset=undefined', '');
     p = p.replaceAll('>undefined<', '><');
     return p
 }
