@@ -14,6 +14,7 @@ class Mobile {
         this.theme = "";
         this.lastElements = [];
         this.itens = [];
+        // this.append = new Append()
     }
 
     isDemo(p, nameComponent, index) {
@@ -99,7 +100,7 @@ class Mobile {
             p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
         }
         var itens = this.itens;
-        if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0 && this.itens.length <= 0) {
+        if(['Nav Bar', 'List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0 && this.itens.length <= 0) {
             this.addItem([{},{},{}])
             if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
         } 
@@ -268,6 +269,34 @@ class Mobile {
             p.forEach( item => this.itens.push(item) )
         }
         return this.itens;
+    }
+
+    navbar(p = {}) {
+        this.propertyIsNullOrDemo(p, 'Nav Bar', ['id', 'theme', 'orientation']);  
+        p.name = p.name ? p.name : p.id;        
+        var component =
+        `
+        <div id=${p.id} data-role="navbar" data-iconpos=${p.iconpos} class=${p._class}>
+            <ul>
+                {ITENS}
+            </ul>
+        </div>
+        `
+        p.itens = '';
+        this.itens.forEach( (item,index)=> {
+            this.propertyIsNullOrDemo(item, 'item', [], index);
+            item.theme = item.theme || p.theme || 'c';
+            var item = 
+            `
+            <li>
+                <a href=${item.href} data-transition=${item.transition} data-theme=${item.theme} data-icon=${item.icon}>
+                    ${item.text}
+                </a>
+            </li>
+            `
+            p.itens = p.itens.concat(item)
+        })
+        return this.finalizy(component, p);
     }
 
     checkboxes(p = {}) {
@@ -458,7 +487,16 @@ class Mobile {
 
 
 
+class Append extends Mobile {
 
+    constructor(lastElements) {
+        super(lastElements)
+    }
+
+    page() {
+        console.log(this.lastElements)
+    }
+}
 
 
 
