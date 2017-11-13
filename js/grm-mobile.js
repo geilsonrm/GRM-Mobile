@@ -1,501 +1,455 @@
-String.prototype.replaceAll = function(searchStr, replaceStr) {
+String.prototype.replaceAll = function (searchStr, replaceStr) {
     var str = this;
-    
     // escape regexp special characters in search string
     searchStr = searchStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    
     return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
 };
 
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+Array.prototype.exist = function (value) {
+    return this.indexOf(value) >= 0
+}
 
 class Mobile {
-
-    constructor(p ={}) {
-        this.theme = "";
-        this.lastElements = [];
+    constructor(p = {}) {
+        this.theme = p.theme || "b";
+        this.html = "";
+        this.idPage = "";
         this.itens = [];
-        // this.append = new Append()
+        this.component = {};
     }
 
-    isDemo(p, nameComponent, index) {
-        const pIsUndefined = Object.keys(p)[0] == undefined;
-        if(pIsUndefined) {
-            p.title = nameComponent;
-            p.heading = nameComponent;
-            p.text = nameComponent;
-            p.icon = 'star';
-            p.trackTheme = 'b';
-            p.highlight = 'true';
-            p.native = 'false';
-            p.name = createID(nameComponent);
-            p.bubble = Math.floor((Math.random() * 200) + 1);
-            p.theme = nameComponent == 'item' ? 'c' : this.theme;   
-            p.text = nameComponent == 'item' ? `${nameComponent} ${index+1}` : nameComponent;
-            // var itens = this.itens;
-            // if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0
-            //    && this.itens.length <= 0) {
-            //     this.addItem([{},{},{}])
-            //     if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
-            // } 
-        } 
-        return p;
+    addAppend(component, nameComponent) {
+        this.appends[nameComponent] = component;
     }
 
-    propertyIsNullOrDemo(p, nameComponent, arrayPropertys = [], index) {
-        // p.itens = ''
-        // checa se o componente é demo
-        // caso seja será atribuído valores de exemplo  
-        this.isDemo(p, nameComponent, index);
-
-        // checa atributos que receberão valor default
-        // caso seja nulo será atribuído valor 
-        if(arrayPropertys.indexOf('id') >= 0) 
-            p.id = p.id ? p.id : createID(nameComponent);
-
-        if(arrayPropertys.indexOf('theme') >= 0) 
-            p.theme = p.theme ? p.theme : this.theme;      
-
-        // if(arrayPropertys.indexOf('inset') >= 0) 
-        //     p.inset = p.inset || true;      
-
-        if(arrayPropertys.indexOf('trackTheme') >= 0) 
-            p.trackTheme = p.trackTheme ? p.trackTheme : this.theme;   
-
-        if(arrayPropertys.indexOf('reverse') >= 0) 
-            p.reverse = p.reverse ? '"reverse"' : undefined;
-
-        if(arrayPropertys.indexOf('newWindow') >= 0) 
-            p.newWindow = p.newWindow ? '"_blank"' : undefined;
-
-        if(arrayPropertys.indexOf('rel') >= 0) 
-            p.rel = p.rel ? '"back"' : undefined;
-
-        if(arrayPropertys.indexOf('href') >= 0) 
-            p.href = p.href ? "#" + p.href : '"#"';
-
-        if(arrayPropertys.indexOf('type') >= 0) 
-            p.type = p.type ? p.type : 'text';
-
-        if(arrayPropertys.indexOf('size') >= 0)             
-            p.size = p.size ? p.size : 1;
-
-        if(arrayPropertys.indexOf('placeholder') >= 0)
-            p.placeholder = p.placeholder ? p.placeholder : "Digite aqui";   
-
-        if(arrayPropertys.indexOf('transition') >= 0)
-            p.transition = p.transition ? p.transition : "flow";
-
-        if(arrayPropertys.indexOf('orientation') >= 0)             
-            p.orientation = p.orientation ? p.orientation : "vertical";        
-        
-        if(arrayPropertys.indexOf('native') >= 0)             
-            p.native = p.native ? p.native : "false";   
-
-        // define append do componente
-        if(['Page'].indexOf(nameComponent) >= 0) {
-            p.append = p.append ? p.append : $('body');
-        } else if( ['Header','Footer', 'Panel'].indexOf(nameComponent) >= 0) {
-            p.append = p.append ? p.append : this.getLastElement('page');
-        } else {
-            p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
-        }
-        var itens = this.itens;
-        if(['Nav Bar', 'List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0 && this.itens.length <= 0) {
-            this.addItem([{},{},{}])
-            if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
-        } 
-
-        return p;
-    }
-
-    setLastElement(element, name) {
-        name = name ? name : 'default';
-        this.lastElements[name] = element;
-        return null;
-    }
-
-    getLastElement(name) {
-        return this.lastElements[name];
-    }
-
-    finalizy(component, p) {
-        // concatena itens ao componente
-        component = component.replace('{ITENS}', p.itens)
-        // remove atributos undefined
-        component = removeUndefined(component);
-        // console.info(component)
-        // converte string em seletor jQuery
-        component = $(component)
-        // insere element no destino informado por p.append
-        console.info(`Component: ${p} | ID: ${p.id}`)
-        p.append.append(component);
-        this.setLastElement(component);     
-        this.itens = [];   
-        return component;
-    }
-
-    // lastElement() {
-    //     const countElements = document.querySelectorAll('[data-role='+ 'page' +']').length;
-    //     return document.querySelectorAll('[data-role='+ 'page' +']')[countElements-1];
+    // append(nameComponent) {
+    //     this.append = this.appends[nameComponent]
     // }
 
-    page(p = {}) {
-        this.theme = p.theme ? p.theme : 'b';
-        this.propertyIsNullOrDemo(p, 'Page', ['id', 'theme']);
-        var component =
-        `
-        <div data-role="page" id=${p.id} class=${p._class} data-control-title=${p.title} data-theme=${p.theme} >
-            <div data-role="content">
-   
-        `
-        component = removeUndefined(component);
-        component = $(component)
-        p.append.append(component);
-        return this.setLastElement(component, 'page');
+    newComponent(p) {
+        this.html = "";
+        this.component.attr = p;
     }
 
-    header(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Header', ['id','theme']);
-        var component =
-        `
-        <div data-role="header" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} >
-            <h1>${p.text || '&nbsp;'}</h1>
-            <a href="#info" data-rel="popup" class="ui-btn ui-btn-icon-notext ui-icon-info ui-btn-b ui-corner-all ui-btn-right"></a>
-        </div>
-        `
-        component = removeUndefined(component);
-        component = $(component)
-        p.append.prepend(component);
-        return this.setLastElement(component, 'header');
+    setNameComponent() {
+        // gets the text between whitespace for second part of stacktrace
+        const pathMethod = (new Error()).stack.match(/at (\S+)/g)[1].slice(3);
+        this.component.name = pathMethod.split('.')[1]
     }
 
-    footer(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Footer', ['id','theme']);  
-        var component =
-        `
-        <div data-role="footer" id=${p.id} class=${p._class} data-theme=${p.theme || this.theme} data-position="fixed" >
-            <h1>${p.text || '&nbsp;'}</h1>
-        </div>
-        `
-        component = removeUndefined(component);
-        component = $(component)
-        p.append.append(component);
-        return this.setLastElement(component, 'header');
+    createID() {
+        // nameElement = nameElement.toLocaleLowerCase();
+        // nameElement = nameElement.replace(/\s/g, ""); // remove todos os espaços
+        var countA = document.querySelectorAll('[data-role=' + this.component.name + ']').length;
+        var countB = document.querySelectorAll('[data-controltype=' + this.component.name + ']').length;
+        var count = countA || countB;
+        const id = this.component.name.concat(count + 1);
+        return id;
     }
 
-
-    button(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Button', ['id','theme', 'reverse', 'newWindow', 'rel', 'transition', 'href']);         
-        var component =
-        `        
-        <a data-role="button" id=${p.id} class=${p._class} data-theme=${p.theme} 
-        target=${p.newWindow} data-inline=${p.line} data-direction=${p.reverse} data-rel=${p.rel} 
-        data-icon=${p.icon} data-iconpos=${p.iconpos} data-transition=${p.transition} href=${p.href}>${p.text || '&nbsp;'}</a>
-        
-        `
-        return this.finalizy(component, p);
-    }
-
-    textinput(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Text Input', ['id', 'theme', 'type', 'placeholder']);
-        var component =
-        `
-        <div data-role="fieldcontain" data-controltype="textinput" class=${p._class}>
-            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <input name=${p.name} id=${p.id} placeholder=${p.placeholder} value=${p.value} type=${p.type}>
-        `
-        return this.finalizy(component, p);
-    }
-
-    textarea(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Text Area', ['id', 'theme', 'placeholder']);
-        var component =
-        `
-        <div data-role="fieldcontain" data-controltype="textarea" class=${p._class}>
-            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <textarea name=${p.name} id=${p.id} placeholder=${p.placeholder} type=${p.type}>${p.value}</textarea>
-        `
-        return this.finalizy(component, p);
-    }
-
-    heading(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Heading', ['id', 'theme', 'size' ]);
-        var component =
-        `
-        <h${p.size} id=${p.id} class=${p._class}>${p.text}</h${p.size}>
-        `
-        return this.finalizy(component, p);
-    }
-
-    link(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Link', ['id', 'theme', 'newWindow', 'href']);
-        var component =
-        `
-        <a id=${p.id} class=${p._class} target=${p.newWindow} data-transition=${p.transition} href=${p.href}>${p.text||Link}</a>
-        `
-        return this.finalizy(component, p);
-    }
-
-    slider(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Slider', ['id', 'theme', 'trackTheme']);   
-        var component =
-        `
-        <div data-role="fieldcontain" data-controltype="slider" class=${p._class}>
-            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <input id=${p.id} type="range" name=${p.name} value=${p.value||50} min=${p.valueMin||0} max=${p.valueMax||100}
-            data-highlight=${p.highlight} data-mini=${p.mini} data-theme=${p.theme} data-track-theme=${p.trackTheme}>
-        `
-        return this.finalizy(component, p);
-    }
-
-    toggleSwitch(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Toggle Switch', ['id', 'theme', ]);
-        var component =
-        `
-        <div data-role="fieldcontain" data-controltype="toggleswitch" class=${p._class} >
-            ${p.title ? `<label for=${p.id}>${p.title}</label>`: ''}
-            <select name=${p.name||p.id} id=${p.id} data-theme=${p.theme} data-role="slider" data-mini=${p.mini}>
-                <option value="off">${p.textOff||"off"}</option>
-                <option value="on">${p.textOn||"on"}</option>
-        `
-        return this.finalizy(component, p);
-    }
-
-    addItem(p = {}) {
-        
-        if(!Array.isArray(p)) {
-            this.itens.push(p);
-        } else {
-            p.forEach( item => this.itens.push(item) )
-        }
-        return this.itens;
-    }
-
-    navbar(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Nav Bar', ['id', 'theme', 'orientation']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
-        <div id=${p.id} data-role="navbar" data-iconpos=${p.iconpos} class=${p._class}>
-            <ul>
-                {ITENS}
-            </ul>
-        </div>
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            this.propertyIsNullOrDemo(item, 'item', [], index);
-            item.theme = item.theme || p.theme || 'c';
-            var item = 
-            `
-            <li>
-                <a href=${item.href} data-transition=${item.transition} data-theme=${item.theme} data-icon=${item.icon}>
-                    ${item.text}
-                </a>
-            </li>
-            `
-            p.itens = p.itens.concat(item)
-        })
-        return this.finalizy(component, p);
-    }
-
-    checkboxes(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Check Boxes', ['id', 'theme', 'orientation']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
-        <div id=${p.id} data-role="fieldcontain" data-controltype="checkboxes">
-            <fieldset data-role="controlgroup" data-type=${p.orientation} data-mini=${p.mini}>
-            ${p.title ? `<legend>${p.title}</legend>`: ''}
-                {ITENS}
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            this.propertyIsNullOrDemo(item, 'item', [], index);
-            item.theme = item.theme || p.theme || 'c';
-            var item = 
-            `
-            <input  id="${p.id}-item${index+1}" name=${item.name} data-theme=${item.theme} type="checkbox">
-            <label for="${p.id}-item${index+1}">${item.text}</label>
-            `
-            p.itens = p.itens.concat(item)
-        })
-        return this.finalizy(component, p);
-    }
-
-    radiobuttons(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Radio Buttons', ['id', 'theme', 'orientation']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
-        <div id=${p.id} data-role="fieldcontain" data-controltype="radiobuttons">
-            <fieldset data-role="controlgroup" data-type=${p.orientation} data-mini=${p.mini}>
-            ${p.title ? `<legend>${p.title}</legend>`: ''}            
-                {ITENS}
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            this.propertyIsNullOrDemo(item, 'item', [], index);
-            item.theme = item.theme || p.theme || 'c';
-            var item = 
-            `
-            <input  id="${p.id}-item${index+1}" name=${p.id} data-theme=${item.theme} type="radio">
-            <label for="${p.id}-item${index+1}">${item.text}</label>
-            `
-            p.itens = p.itens.concat(item)
-        })
-        return this.finalizy(component, p);
-    }
-
-    selectMenu(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Select Menu', ['id', 'theme']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
-        <div data-role="fieldcontain" data-controltype="selectmenu" class=${p._class}>
-            ${p.title ? `<label for=${p.id} >${p.title}</label>`: ''}  
-            <select id=${p.id} data-native-menu=${p.native} name=${p.name} data-theme=${p.theme} data-mini=${p.mini}>
-                {ITENS}
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            this.propertyIsNullOrDemo(item, 'item', [], index);
-            var item = 
-            `
-            <option value="${p.value||index}">${item.text}</option>
-            `
-            p.itens = p.itens.concat(item)
-        })
-        return this.finalizy(component, p);
-    }
-
-    collapsible(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Collapsible', ['id', 'theme']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
-        <div id=${p.id} data-role="collapsible-set" data-theme=${p.theme} data-content-theme=${p.themeContent||'b'} class=${p._class}>
-            {ITENS}
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            this.propertyIsNullOrDemo(item, 'item', [], index);
-            var item = 
-            `
-            <div id="${p.id}-item${index+1}" data-role="collapsible" data-collapsed=${item.collapsed||true}>
-                <h3>${item.text}</h3>
-            </div>
-            `
-            p.itens = p.itens.concat(item)
-        })
-        return this.finalizy(component, p);
-    }
-
-    listview(p = {}) {
-        this.propertyIsNullOrDemo(p, 'List View', ['id', 'theme', 'inset']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
-        <ul id=${p.id} data-role="listview" data-divider-theme=${p.themeDivider||'b'} data-inset=${(!!p.inset)||true} class=${p._class}>            
-            {ITENS}
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            if(!item.divider) {
-                this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
-                item.theme = item.theme || 'c';
-                var item = 
-                `
-                <li data-theme=${item.theme}>
-                    ${ !item.readOnly ? `<a href=${item.href} data-transition=${item.transition}>` : ''}
-                        ${item.text}
-                        ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
-                    ${ !item.readOnly ? '</a>' : ''}
-                </li>
-                `
-            } else {
-                var item = 
-                `
-                <li data-role="list-divider" role="heading">
-                    ${item.text||'&nbsp;'}
-                    ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
-                `
-            }
-            p.itens += item
-            
-        })
-        
-        return this.finalizy(component, p);
-    }
-
-
+    removePropriesIfUndefined() {
+    // console.log(this.html)
     
-    panel(p = {}) {
-        this.propertyIsNullOrDemo(p, 'Panel', ['id', 'theme', 'inset']);  
-        p.name = p.name ? p.name : p.id;        
-        var component =
-        `
+        this.html = this.html.replaceAll('id="undefined"', '');
+        this.html = this.html.replaceAll('class=undefined', '');
+        this.html = this.html.replaceAll('target="undefined"', '');
+        this.html = this.html.replaceAll('data-rel="undefined"', '');
+        this.html = this.html.replaceAll('data-inline="undefined"', '');
+        this.html = this.html.replaceAll('data-direction="undefined"', '');
+        this.html = this.html.replaceAll('data-transition="undefined"', '');
+        this.html = this.html.replaceAll('placeholder="undefined"', '');
+        this.html = this.html.replaceAll('value="undefined"', 'value=""');
+        this.html = this.html.replaceAll('name="undefined"', 'name=""');
+        this.html = this.html.replaceAll('data-icon="undefined"', '');
+        this.html = this.html.replaceAll('data-iconpos="undefined"', '');
+        this.html = this.html.replaceAll('data-mini="undefined"', '');
+        this.html = this.html.replaceAll('data-inset="undefined"', '');
+        this.html = this.html.replaceAll('data-track-theme="undefined"', '');
+        this.html = this.html.replaceAll('>undefined<', '><');
+    }
 
-        <div data-role="panel" id="aabb" data-position="left" data-display="reveal" data-theme="a">
-            <ul data-role="listview" data-divider-theme="h" data-inset="false">
-                <li data-role="list-divider" role="heading">Divider</li>
-                <li data-theme="a"><a href="" data-transition="slide">Button</a></li>
-            </ul>
-        </div>
-        `
-        p.itens = '';
-        this.itens.forEach( (item,index)=> {
-            if(!item.divider) {
-                this.propertyIsNullOrDemo(item, 'item', ['id', 'href', 'transition', 'bubble'], index);
-                item.theme = item.theme || 'c';
-                var item = 
-                `    <div data-role="panel" id="aabb" data-position="left" data-display="reveal"
-    data-theme="a">
+isDemo() {
+    this.component.demo = Object.keys(this.component.attr)[0] == undefined;
+}
+
+setIdPage() {
+    this.idPage = this.component.attr.id;
+}
+
+appendHtml() {
+    if (['page'].indexOf(this.component.name) >= 0) {
+        $('body').append(this.html)
+    } else if(['header'].indexOf(this.component.name) >= 0) {
+        $(`#${this.idPage}`).prepend(this.html)
+    } else if(['footer'].indexOf(this.component.name) >= 0) {
+        $(`#${this.idPage}`).append(this.html)
+    } else if(['panel'].indexOf(this.component.name) >= 0) {
+        $(`#${this.idPage}`).prepend(this.html)
+    } else {
+        $(`#${this.idPage}`).find('div[data-role=content]').append(this.html)
+        // p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+    }
+}
+
+createPropriesIfDemo() {
+    const id = this.createID();
+    if (this.component.demo) {
+        this.component.attr.title = this.component.name.capitalize();
+        this.component.attr.heading = this.component.name.capitalize();
+        this.component.attr.text = this.component.name.capitalize();
+        this.component.attr.icon = 'star';
+        this.component.attr.highlight = 'true';
+        this.component.attr.name = id;
+        // var itens = this.itens;
+        // if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0
+        //    && this.itens.length <= 0) {
+        //     this.addItem([{},{},{}])
+        //     if(nameComponent == 'List View') itens.unshift({divider:true, text:nameComponent});
+        // } 
+    }
+}
+
+createPropriesIfNull(arr) {  
+    const p = this.component.attr;      
+    const id = this.createID();
+    // this.setPropertyToDemo(p, nameComponent, index);
+
+    if (!p.id && arr.exist('id')) p.id = id;
+    if (!p.href && arr.exist('href')) p.newWindow = '#';
+    if (!p.type && arr.exist('type')) p.type = 'text';
+    if (!p.theme && arr.exist('theme')) p.theme = this.theme;
+    if (!p.reverse && arr.exist('reverse')) p.reverse = '#';
+    if (!p.newWindow && arr.exist('newWindow')) p.newWindow = '_blank';
+    if (!p.transition && arr.exist('transition')) p.transition = 'flow';
+    if (!p.placeholder && arr.exist('placeholder')) p.placeholder = 'Digite aqui';
+}
+
+
+page(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfNull(['id', 'theme', 'reverse', 'newWindow', 'rel', 'transition', 'href'])
+    var p = this.component.attr;
+    this.html +=
+    `<div placeholder="${p.placeholder}" data-role="page" id="${p.id}" class="${p.class}" data-control-title="${p.title||p.id}" data-theme="${p.theme}" >
+        <div data-role="content">`
+    this.removePropriesIfUndefined()
+    this.setIdPage()
+    this.appendHtml();
+    return this.component.attr.id
+}
+
+header(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="header" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}" >
+        <h1>${p.text || '&nbsp;'}</h1>
+        <a href="#info" data-rel="popup" class="ui-btn ui-btn-icon-notext ui-icon-info ui-btn-b ui-corner-all ui-btn-right"></a>
+     </div>`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+footer(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="footer" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}" data-position="fixed" >
+        <h1>${p.text || '&nbsp;'}</h1>
+     </div>`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+button(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme', 'reverse', 'newWindow', 'rel', 'transition', 'href'])
+    var p = this.component.attr;
+    this.html +=
+    `<a data-role="button" id="${p.id}" class="${p.class}" data-theme="${p.theme}" target="${p.newWindow}"
+      data-inline="${p.line}" data-direction="${p.reverse}" data-rel="${p.rel}" data-icon="${p.icon}" 
+      data-iconpos="${p.iconpos}" data-transition="${p.transition}" href="${p.href}">${p.text || '&nbsp;'}
+     </a>`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+textInput(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme', 'type', 'placeholder'])
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="fieldcontain" data-controltype="textinput" class="${p.class}">
+        ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
+        <input name="${p.name}" id="${p.id}" placeholder="${p.placeholder}" value="${p.value}" type="${p.type}">`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+heading(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme', 'text'])
+    var p = this.component.attr;
+    this.html +=
+    `<h${p.size||1} id="${p.id}" class="${p.class}">${p.text}</h${p.size||1}>`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+link(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme', 'newWindow', 'href'])
+    var p = this.component.attr;
+    this.html +=
+    `<a id="${p.id}" class="${p.class}" target="${p.newWindow}" data-transition="${p.transition}" 
+      href="${p.href}">${p.text || Link}</a>`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+slider(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="fieldcontain" data-controltype="slider" class=${p.class}>
+        ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
+        <input id="${p.id}" type="range" name="${p.name}" value="${p.value || 50}" min="${p.valueMin || 0}" 
+         max="${p.valueMax || 100}" data-highlight="${p.highlight}" data-mini="${p.mini}" data-theme="${p.theme}"
+         data-track-theme="${p.trackTheme||this.theme}">`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+toggleSwitch(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="fieldcontain" data-controltype="toggleswitch" class="${p.class}" >
+        ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
+        <select name="${p.name || p.id}" id="${p.id}" data-theme="${p.theme}" data-role="slider" data-mini="${p.mini}">
+            <option value="off">${p.textOff || "off"}</option>
+            <option value="on">${p.textOn || "on"}</option>`
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+addItem(p = {}) {
+    if (!Array.isArray(p)) {
+        this.itens.push(p);
+    } else {
+        p.forEach(item => this.itens.push(item))
+    }
+    return this.itens;
+}
+
+addItensIfItensNull() {
+    if (this.itens.length <= 0) this.addItem([{},{},{}])
+}
+
+clearItens() {
+    this.itens = [];
+}
+
+checkBoxes(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    this.addItensIfItensNull()
+    var p = this.component.attr;
+    this.html +=
+    `<div id="${p.id}" data-role="fieldcontain" data-controltype="checkboxes">
+        <fieldset data-role="controlgroup" data-type="${p.orientation||'vertical'}" data-mini="${p.mini}">
+        ${p.title ? `<legend>${p.title}</legend>` : ''}`
+   
+    this.itens.forEach((item, index) => {
+        index++
+        this.html +=
+       `<input  id="${p.id}-item${index}" name="${item.name||"Item "+index}" data-theme="${item.theme||this.theme}" 
+         type="checkbox">
+        <label for="${p.id}-item${index}">${item.text||"Item "+index}</label>`
+    })
+    this.clearItens();
+    this.removePropriesIfUndefined();
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+radioButtons(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    this.addItensIfItensNull()
+    var p = this.component.attr;
+    this.html +=
+    `<div id="${p.id}" data-role="fieldcontain" data-controltype="radiobuttons">
+        <fieldset data-role="controlgroup" data-type="${p.orientation||'vertical'}" data-mini="${p.mini}">
+        ${p.title ? `<legend>${p.title}</legend>` : ''}`
+   
+    this.itens.forEach((item, index) => {
+        index++
+        this.html +=
+       `<input  id="${p.id}-item${index}" name="${p.id}" data-theme="${item.theme||this.theme}" type="radio">
+        <label for="${p.id}-item${index}">${item.text||"Item "+index}</label>`
+    })
+    this.clearItens();
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+selectMenu(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    this.addItensIfItensNull()    
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="fieldcontain" data-controltype="selectmenu" class="${p.class}">
+        ${p.title ? `<label for="${p.id}" >${p.title}</label>` : ''}  
+        <select id="${p.id}" data-native-menu="${p.native||false}" name="${p.name}" 
+         data-theme="${p.theme}" data-mini="${p.mini}">`
+   
+    this.itens.forEach((item, index) => {
+        index++
+        this.html +=
+       `<option value="${p.value || index}">${item.text||"Item "+index}</option>`
+    })
+    this.clearItens();
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+collapsible(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    this.addItensIfItensNull()    
+    var p = this.component.attr;
+    this.html +=
+    `<div id="${p.id}" data-role="collapsible-set" data-theme="${p.theme}" 
+      data-content-theme="${p.themeContent || this.theme}" class="${p.class}">`
+   
+    this.itens.forEach((item, index) => {
+        index++
+        this.html +=
+       `<div id="${p.id}-item${index}" data-role="collapsible" data-collapsed="${item.collapsed || true}">
+            <h3>${item.text||"Item "+index}</h3>
+        </div>`
+    })
+    this.clearItens();
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+listView(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    this.addItensIfItensNull()    
+    var p = this.component.attr;
+    this.html +=
+    `<ul id="${p.id}" data-role="listview" data-divider-theme="${p.themeDivider || this.theme}" 
+      data-inset="${(!!p.inset) || true}" class="${p.class}">`
+   
+    this.itens.forEach((item, index) => {
+        if(this.component.demo) item.bubble = Math.floor((Math.random() * 200) + 1);
+        index++
+        this.html +=
+       `<li data-theme="${item.theme||this.theme}">
+            ${ !item.readOnly ? `<a href="${item.href||"#"}" data-transition="${item.transition}">` : ''}
+                ${item.text||"Item "+index}
+                ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
+            ${ !item.readOnly ? '</a>' : ''}
+        </li>`
+    })
+    this.clearItens();
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
+}
+
+panel(p = {}) {
+    this.newComponent(p)
+    this.setNameComponent()
+    this.isDemo()
+    this.createPropriesIfDemo()
+    this.createPropriesIfNull(['id', 'theme'])
+    this.addItensIfItensNull()    
+    var p = this.component.attr;
+    this.html +=
+    `<div data-role="panel" id="panel1" data-position="left" data-display="reveal" data-theme="a">
         <ul data-role="listview" data-divider-theme="h" data-inset="false">
-            <li data-role="list-divider" role="heading">
-                Divider
-            </li>
-            <li data-theme="a">
-                <a href="" data-transition="slide">
-                    Button
-                </a>
-            </li>
+            <li data-role="list-divider" role="heading">Divider</li>
+            <li data-theme="a"><a href="" data-transition="slide">Button</a></li>
         </ul>
-    </div>
-                `
-            } else {
-                var item = 
-                `
-                <li data-role="list-divider" role="heading">
-                    ${item.text||'&nbsp;'}
-                    ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
-                `
-            }
-            p.itens += item
-            
-        })
-        component = removeUndefined(component);
-        component = $(component)
-        p.append.prepend(component);
-        return this.setLastElement(component, 'header');
-        // return this.finalizy(component, p);
-    }
-
-
+    </div>`
+   
+    this.itens.forEach((item, index) => {
+        if(this.component.demo) item.bubble = Math.floor((Math.random() * 200) + 1);
+        index++
+        this.html +=
+       ` `
+    })
+    this.clearItens();
+    this.removePropriesIfUndefined()
+    this.appendHtml();    
+    return this.component.attr.id
 }
 
-
-
-
-class Append extends Mobile {
-
-    constructor(lastElements) {
-        super(lastElements)
-    }
-
-    page() {
-        console.log(this.lastElements)
-    }
 }
 
 
@@ -503,35 +457,6 @@ class Append extends Mobile {
 
 
 
-// var mobile = new Mobile('e')
-
-// mobile.page({theme:'d'})
-// mobile.header()
-// mobile.footer()
-// mobile.button()
-// mobile.textinput()
-// mobile.textarea()
-// mobile.heading()
-// mobile.link()
-// mobile.toggleSwitch()
-// mobile.slider()
-// mobile.checkboxes()
-// mobile.button({transition:'flow', text:'Mirandola', icon:'gear', iconpos:'right', href:'page3'})
-
-
-
-// mobile.page({theme:'c'})
-// mobile.header()
-// mobile.button({text:'Voltar', rel:true})
-// mobile.heading({text:'Page 2'})
-
-
-
-
-
-
-
- 
 
 
 
@@ -540,50 +465,6 @@ class Append extends Mobile {
 
 
 
-var aux = {};
-
-function createID(nameElement) {
-    nameElement = nameElement.toLocaleLowerCase();
-    nameElement = nameElement.replace(/\s/g, ""); // remove todos os espaços
-    var countA = document.querySelectorAll('[data-role='+ nameElement +']').length;
-    var countB = document.querySelectorAll('[data-controltype='+ nameElement +']').length;
-    var count = countA || countB;
-    return nameElement.concat(count + 1)
-}
-
-function finalizy(component, p) {
-    // remove atributos undefined
-    component = removeUndefined(component);
-    console.info(component)
-    // converte string em seletor jQuery
-    component = $(component)
-    // insere element no destino informado por p.append
-    p.append.append(component);
-    return component;
-}
-
-function removeUndefined(p) {
-
-
-    p = p.replaceAll('id=undefined', '');
-    p = p.replaceAll('class=undefined', '');
-    p = p.replaceAll('target=undefined', '');
-    p = p.replaceAll('data-rel=undefined', '');
-    p = p.replaceAll('data-inline=undefined', '');
-    p = p.replaceAll('data-direction=undefined', '');
-    p = p.replaceAll('data-transition=undefined', '');
-    p = p.replaceAll('data-highlight=undefined', '');
-    p = p.replaceAll('placeholder=undefined', '');
-    p = p.replaceAll('value=undefined', 'value=""');
-    p = p.replaceAll('name=undefined', 'name=""');
-    p = p.replaceAll('data-icon=undefined', '');
-    p = p.replaceAll('data-iconpos=undefined', '');
-    p = p.replaceAll('data-native-menu=undefined', '');
-    p = p.replaceAll('data-mini=undefined', '');
-    p = p.replaceAll('data-inset=undefined', '');
-    p = p.replaceAll('>undefined<', '><');
-    return p
-}
 
 
 
