@@ -1,30 +1,19 @@
-var mobile = new Mobile({theme:'e'})
+var mobile = new Mobile()
 
 // Pagina 1
-mobile.page()
+mobile.page({fixed:true})
 mobile.header()
 mobile.footer()
 
 mobile.listView({})
-
-mobile.addItem()
-mobile.addItem()
 mobile.panel({})
-
 mobile.collapsible({})
-
-
 mobile.selectMenu({})
-
-
 mobile.radioButtons({})
-
-
 mobile.checkBoxes({})
 
 mobile.toggleSwitch({})
 mobile.slider({})
-mobile.button({})
-mobile.textInput({})
+mobile.button({text:'Salvar'})
+mobile.textInput({title:'Aluno'})
 mobile.heading({})
-mobile.link({href:'#panel1', text:'Panel'})

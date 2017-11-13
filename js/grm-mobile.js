@@ -13,13 +13,34 @@ Array.prototype.exist = function (value) {
     return this.indexOf(value) >= 0
 }
 
+class Console {
+    constructor(nameComponent, id, tip) {
+        this.nameComponent = nameComponent;
+        this.id = id;
+        this.tip = tip;
+    }
+}
 class Mobile {
     constructor(p = {}) {
-        this.theme = p.theme || "b";
+        this.theme = p.theme||"b";
         this.html = "";
         this.idPage = "";
         this.itens = [];
         this.component = {};
+        this.arrayConsole = [];
+    }
+
+    setConsole(nameComponent, id, tip) {
+        const console = new Console(
+            this.component.name, 
+            this.component.attr.id, 
+            this.component.attr.title||this.component.attr.text||this.component.attr.name
+        )
+        this.arrayConsole.push(console)
+    }
+
+    info() {
+        console.table(this.arrayConsole)
     }
 
     addAppend(component, nameComponent) {
@@ -93,6 +114,7 @@ appendHtml() {
         $(`#${this.idPage}`).find('div[data-role=content]').append(this.html)
         // p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
     }
+    this.setConsole()
 }
 
 createPropriesIfDemo() {
@@ -103,7 +125,7 @@ createPropriesIfDemo() {
         this.component.attr.text = this.component.name.capitalize();
         this.component.attr.icon = 'star';
         this.component.attr.highlight = 'true';
-        this.component.attr.name = id;
+        // this.component.attr.name = id;
         // var itens = this.itens;
         // if(['List View', 'Collapsible', 'Select Menu', 'Radio Buttons', 'Check Boxes'].indexOf(nameComponent) >= 0
         //    && this.itens.length <= 0) {
@@ -137,7 +159,7 @@ page(p = {}) {
     var p = this.component.attr;
     this.html +=
     `<div placeholder="${p.placeholder}" data-role="page" id="${p.id}" class="${p.class}" data-control-title="${p.title||p.id}" data-theme="${p.theme}" >
-        <div data-role="content">`
+    <div data-role="content">`
     this.removePropriesIfUndefined()
     this.setIdPage()
     this.appendHtml();
