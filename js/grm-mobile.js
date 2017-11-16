@@ -39,6 +39,7 @@ class Mobile {
         this.itens = [];
         this.component = {};
         this.arrInfo = [];
+        this.bufferComponentsForAppend = []
     }
 // 
     setInfo(nameComponent, id, tip) {
@@ -108,6 +109,16 @@ class Mobile {
         // this.component.demo = Object.keys(this.component.attr)[0] == undefined;
     }
 
+    setAppendType() {
+            if(typeof this.component.attr.appendId == 'object') {
+                this.component.attr.appendId = 'page1'
+                this.bufferComponentsForAppend.push( this.component.attr.appendId )
+            }
+            
+        this.component.appendType = $(`#${this.component.attr.appendId}`).attr('data-role');
+        // console.info(this.component.appendType)        
+    }
+
     setPageId() {
         this.pageId = this.component.attr.id;
     }
@@ -127,6 +138,13 @@ class Mobile {
     appendHtml() {
         const p = this.component.attr
         const destin = $(`#${p.appendId}`);
+
+console.info(typeof p.appendId)
+// try {
+//     if(typeof p.appendId == 'object') alert()
+// } catch(err) {
+//     console.info(err)
+// }
         // nome do componente
         if (['page'].exist(this.component.name)) {
             $('body').append(this.html)
@@ -138,13 +156,10 @@ class Mobile {
             destin.append(this.html)
             
         } else {
-            // nome do destino
-            if(p.appendId.indexOf('header') >= 0 )
-                destin.append(this.html)
-            if(p.appendId.indexOf('footer') >= 0 )
-                destin.append(this.html)
-            if(p.appendId.indexOf('page') >= 0 )
-                destin.find('div[data-role=content]').append(this.html)
+            if( destin.attr('data-role') == 'header' ) destin.append(this.html)
+            if( destin.attr('data-role') == 'footer' ) destin.append(this.html)
+            if( destin.attr('data-role') == 'panel' )  destin.append(this.html)
+            if( destin.attr('data-role') == 'page' )   destin.find('div[data-role=content]').append(this.html)
         }
         this.setInfo()
     }
@@ -170,6 +185,7 @@ class Mobile {
         if (!p.text && arr.exist('text')) p.text = this.component.name.capitalize();
         if (!p.href && arr.exist('href')) p.href = '#';
         if (!p.type && arr.exist('type')) p.type = 'text';
+        if (p.inset == undefined && arr.exist('inset')) p.inset = true;
         if (!p.theme && arr.exist('theme')) p.theme = this.theme;
         if (!p.reverse && arr.exist('reverse')) p.reverse = '#';
         if (!p.appendId && arr.exist('appendId')) p.appendId = this.pageId;
@@ -184,6 +200,7 @@ class Mobile {
         this.newComponent(p)
         this.setNameComponent()
         this.createPropriesIfNull(['reverse', 'newWindow', 'rel', 'transition', 'href'])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div placeholder="${p.placeholder}" data-role="page" id="${p.id}" class="${p.class}"
@@ -201,6 +218,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div data-role="header" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}">
@@ -218,6 +236,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div data-role="footer" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}" 
@@ -236,6 +255,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull(['reverse', 'newWindow', 'rel', 'transition', 'href'])
+        this.setAppendType()
         var p = this.component.attr;
         if(!p.text) p.iconPosition = "notext";
         this.html += `
@@ -256,6 +276,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull(['type', 'placeholder'])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div data-role="fieldcontain" data-controltype="textinput" class="${p.class}">
@@ -274,6 +295,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull(['text'])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <h${p.size || 1} id="${p.id}" class="${p.class}">${p.text}</h${p.size || 1}>`
@@ -289,6 +311,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <iframe align="middle" data-controltype="youtube" id="${p.id}" type="text/html"
@@ -307,6 +330,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <iframe align="middle" data-controltype="vimeo" id="${p.id}" type="text/html"
@@ -325,6 +349,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <a href="${p.href || "#"}" data-controltype="image" target="${p.newWindow}" id="${p.id}"
@@ -347,6 +372,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull(['newWindow', 'href'])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <a id="${p.id}" class="${p.class}" target="${p.newWindow}" data-transition="${p.transition}" 
@@ -363,6 +389,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div data-role="fieldcontain" data-controltype="slider" class="${p.class}">
@@ -382,6 +409,7 @@ class Mobile {
         this.setNameComponent()
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div data-role="fieldcontain" data-controltype="toggleswitch" class="${p.class}" >
@@ -420,6 +448,7 @@ class Mobile {
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
         this.addItensIfItensNull()
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div id="${p.id}" data-role="fieldcontain" data-controltype="checkboxes">
@@ -448,6 +477,7 @@ class Mobile {
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
         this.addItensIfItensNull()
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div id="${p.id}" data-role="fieldcontain" data-controltype="radiobuttons">
@@ -474,6 +504,7 @@ class Mobile {
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
         this.addItensIfItensNull()
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div data-role="fieldcontain" data-controltype="selectmenu" class="${p.class}">
@@ -500,6 +531,7 @@ class Mobile {
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
         this.addItensIfItensNull()
+        this.setAppendType()
         var p = this.component.attr;
         this.html += `
         <div id="${p.id}" data-role="collapsible-set" data-theme="${p.theme}" 
@@ -524,12 +556,14 @@ class Mobile {
         this.newComponent(p)
         this.setNameComponent()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull([])
+        this.createPropriesIfNull(['inset'])
         this.addItensIfItensNull()
+        this.setAppendType()
         var p = this.component.attr;
+        if(this.component.appendType == 'panel') p.inset = false
         this.html += `
         <ul id="${p.id}" data-role="listview" data-divider-theme="${p.themeDivider || this.theme}" 
-        data-inset="${(!!p.inset) || true}" class="${p.class}">`
+        data-inset="${p.inset}" class="${p.class}">`
 
         this.itens.forEach((item, index) => {
             if (this.component.demo) item.bubble = Math.floor((Math.random() * 200) + 1);
@@ -556,15 +590,13 @@ class Mobile {
         this.createPropriesIfDemo()
         this.createPropriesIfNull([])
         this.addItensIfItensNull()
-        var p = this.component.attr;
+        this.setAppendType()
+        var p = this.component.attr;   
+        // if(this.component.appendType == 'panel')   
         this.html += `
         <div data-role="panel" id="panel1" data-position="left" data-display="reveal" data-theme="a">
-            <ul data-role="listview" data-divider-theme="h" data-inset="false">
-                <li data-role="list-divider" role="heading">Divider</li>
-                <li data-theme="a"><a href="" data-transition="slide">Button</a></li>
-            </ul>
-        </div>`
 
+        </div>`
         this.itens.forEach((item, index) => {
             if (this.component.demo) item.bubble = Math.floor((Math.random() * 200) + 1);
             index++
