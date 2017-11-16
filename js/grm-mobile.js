@@ -5,6 +5,17 @@ String.prototype.replaceAll = function (searchStr, replaceStr) {
     return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
 };
 
+String.prototype.insert = function (index, string) {
+    if (index > 0)
+      return this.substring(0, index) + string + this.substring(index, this.length);
+    else
+      return string + this;
+};
+
+String.prototype.reverse = function(){
+    return this.split("").reverse().join("");
+}
+
 String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
@@ -24,13 +35,13 @@ class Mobile {
     constructor(p = {}) {
         this.theme = p.theme || "b";
         this.html = "";
-        this.idPage = "";
+        this.pageId = "";
         this.itens = [];
         this.component = {};
         this.arrInfo = [];
-        this.append = "";
+        this.appendId = "";
     }
-
+// 
     setInfo(nameComponent, id, tip) {
         const console = new Console(
             this.component.name,
@@ -97,31 +108,47 @@ class Mobile {
         this.component.demo = Object.keys(this.component.attr)[0] == undefined;
     }
 
-    setIdPage() {
-        this.idPage = this.component.attr.id;
+    setPageId() {
+        this.pageId = this.component.attr.id;
     }
 
     renderPage() {
-        if (document.readyState === "complete")
-            jQuery(`#${this.idPage}`).trigger('pagecreate');
+        // console.info(this.component.name)
+        // if (document.readyState === "complete")
+        //     jQuery(`#${this.pageId}`).trigger('pagecreate');
     }
 
-    setAppend(id) {
-        this.append = id ? $(`#${id || ""}`) : "";
+    renderPage2() {
+        // console.info(this.component.name)
+        if (document.readyState === "complete")
+            jQuery(`#${this.pageId}`).trigger('pagecreate');
+    }
+
+    setAppendId(id) {
+        console.log('--->', id||this.pageId);
+        this.appendId = id||this.pageId;
     }
 
     appendHtml() {
+        const destin = $(`#${this.appendId}`);
+        // nome do componente
         if (['page'].indexOf(this.component.name) >= 0) {
             $('body').append(this.html)
-        } else if (['header'].indexOf(this.component.name) >= 0) {
-            $(`#${this.idPage}`).prepend(this.html)
+
+        } else if (['header', 'panel'].indexOf(this.component.name) >= 0) {
+            destin.prepend(this.html)
+
         } else if (['footer'].indexOf(this.component.name) >= 0) {
-            $(`#${this.idPage}`).append(this.html)
-        } else if (['panel'].indexOf(this.component.name) >= 0) {
-            $(`#${this.idPage}`).prepend(this.html)
+            destin.append(this.html)
+            
         } else {
-            $(`#${this.idPage}`).find('div[data-role=content]').append(this.html)
-            // p.append = p.append ? p.append : this.getLastElement('page').find('div[data-role=content]');
+            // nome do destino
+            if(this.appendId.indexOf('header') >= 0 )
+                destin.append(this.html)
+            if(this.appendId.indexOf('footer') >= 0 )
+                destin.append(this.html)
+            if(this.appendId.indexOf('page') >= 0 )
+                destin.find('div[data-role=content]').append(this.html)
         }
         this.setInfo()
     }
@@ -134,6 +161,8 @@ class Mobile {
             this.component.attr.text = this.component.name.capitalize();
             this.component.attr.icon = 'star';
             this.component.attr.highlight = 'true';
+           if(this.component.name == 'header')
+            this.component.attr.text += ` - ${this.pageId.capitalize().insert(this.pageId.length-1,' 0')}`
         }
     }
 
@@ -147,7 +176,7 @@ class Mobile {
         if (!p.type && arr.exist('type')) p.type = 'text';
         if (!p.theme && arr.exist('theme')) p.theme = this.theme;
         if (!p.reverse && arr.exist('reverse')) p.reverse = '#';
-        if (!p.newWindow && arr.exist('newWindow')) p.newWindow = '_blank';
+        // if (!p.newWindow && arr.exist('newWindow')) p.newWindow = '_blank';
         if (!p.transition && arr.exist('transition')) p.transition = 'flow';
         if (!p.placeholder && arr.exist('placeholder')) p.placeholder = 'Digite aqui';
     }
@@ -163,7 +192,8 @@ class Mobile {
     <div placeholder="${p.placeholder}" data-role="page" id="${p.id}" class="${p.class}" data-control-title="${p.title || p.id}" data-theme="${p.theme}" >
     <div data-role="content">`
         this.removePropriesIfUndefined()
-        this.setIdPage()
+        this.setPageId()
+        this.setAppendId()
         this.appendHtml();
         return this.component.attr.id
     }
