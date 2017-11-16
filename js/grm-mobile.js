@@ -33,13 +33,13 @@ class Console {
 }
 class Mobile {
     constructor(p = {}) {
-        this.theme = p.theme || "b";
+        this.theme = "";
         this.html = "";
         this.pageId = "";
         this.itens = [];
         this.component = {};
         this.arrInfo = [];
-        this.bufferAppendId = "";
+        this.bufferAppend = [];
     }
 // 
     setInfo(nameComponent, id, tip) {
@@ -138,13 +138,6 @@ class Mobile {
     appendHtml() {
         const p = this.component.attr
         const destin = $(`#${p.appendId}`);
-
-// try {
-//     if(typeof p.appendId == 'object') alert()
-// } catch(err) {
-//     console.info(err)
-// }
-        // nome do componente
         if (['page'].exist(this.component.name)) {
             $('body').append(this.html)
 
@@ -159,6 +152,7 @@ class Mobile {
             if( destin.attr('data-role') == 'footer' ) destin.append(this.html)
             if( destin.attr('data-role') == 'panel' )  destin.append(this.html)
             if( destin.attr('data-role') == 'page' )   destin.find('div[data-role=content]').append(this.html)
+            if( destin.attr('data-role') == 'collapsible' ) destin.append(this.html)
         }
         this.setInfo()
     }
@@ -172,7 +166,7 @@ class Mobile {
             this.component.attr.icon = 'star';
             this.component.attr.highlight = 'true';
            if(this.component.name == 'header')
-            this.component.attr.text += ` - ${this.pageId.capitalize().insert(this.pageId.length-1,' 0')}`
+            this.component.attr.text += ` ${this.pageId.capitalize().insert(this.pageId.length-1,' 0')}`
         }
     }
 
@@ -193,10 +187,14 @@ class Mobile {
         // if (!p.newWindow && arr.exist('newWindow')) p.newWindow = '_blank';
     }
 
+    setTheme() {
+        this.theme = this.component.attr.theme ? this.component.attr.theme : 'b';
+    }
 
     page(p = {}) {
         this.isDemo(arguments[0])
         this.newComponent(p)
+        this.setTheme()
         this.setNameComponent()
         this.createPropriesIfNull(['reverse', 'newWindow', 'rel', 'transition', 'href'])
         this.setAppendType()
@@ -211,24 +209,7 @@ class Mobile {
         return this.component.attr.id
     }
 
-    isArgumentsAppend(arg) {
-        this.bufferAppendId = this.component.attr.id
-        // console.info('>>',this.component.attr.id)
-        // console.info('>>',this.component.attr.appendId)
-        const sizeArg = arg.length;
-        // console.log(sizeArg)
-        for(let i=1; i<=sizeArg; i++) {
-            // var element = arg[i]; //.replace('(','({appendId:abc}')
-            // console.info(element)
-        }
-        // console.log($('#header1'))
-        // arg.forEach( function(item) {
-        //     console.log(item)
-        // })
-    }
-
     header(p = {}) {
-        alert('header')
         // this.isArgumentsAppend(arguments)
         this.isDemo(arguments[0])
         this.newComponent(p)
@@ -244,7 +225,6 @@ class Mobile {
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
-        this.isArgumentsAppend(arguments)
         return this.component.attr.id
     }
 
@@ -268,13 +248,6 @@ class Mobile {
     }
 
     button(p = {}) {
-        alert('button')
-        console.info('>>>',this.bufferAppendId)
-        // if (this.caller == null) {
-        //     console.log('The function was called from the top!');
-        //   } else {
-        //     console.log('This function\'s caller was ' + this.caller);
-        //   }
         this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
@@ -283,10 +256,11 @@ class Mobile {
         this.setAppendType()
         var p = this.component.attr;
         if(!p.text) p.iconPosition = "notext";
+        if(p.backHistoric) p.backHistoric = "back";
         this.html += `
         <a data-role="button" id="${p.id}" class="${p.class}" data-theme="${p.theme}"
          target="${p.newWindow}" data-inline="${p.line}" data-direction="${p.reverse}" 
-         data-rel="${p.rel}" data-icon="${p.icon}" data-iconpos="${p.iconPosition}" 
+         data-rel="${p.backHistoric}" data-icon="${p.icon}" data-iconpos="${p.iconPosition}" 
          data-transition="${p.transition}" href="${p.href}">${p.text || '&nbsp;'}
         </a>`
         this.removePropriesIfUndefined()
