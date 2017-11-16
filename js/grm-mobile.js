@@ -39,7 +39,7 @@ class Mobile {
         this.itens = [];
         this.component = {};
         this.arrInfo = [];
-        this.bufferComponentsForAppend = []
+        this.bufferAppendId = "";
     }
 // 
     setInfo(nameComponent, id, tip) {
@@ -139,7 +139,6 @@ class Mobile {
         const p = this.component.attr
         const destin = $(`#${p.appendId}`);
 
-console.info(typeof p.appendId)
 // try {
 //     if(typeof p.appendId == 'object') alert()
 // } catch(err) {
@@ -212,7 +211,25 @@ console.info(typeof p.appendId)
         return this.component.attr.id
     }
 
+    isArgumentsAppend(arg) {
+        this.bufferAppendId = this.component.attr.id
+        // console.info('>>',this.component.attr.id)
+        // console.info('>>',this.component.attr.appendId)
+        const sizeArg = arg.length;
+        // console.log(sizeArg)
+        for(let i=1; i<=sizeArg; i++) {
+            // var element = arg[i]; //.replace('(','({appendId:abc}')
+            // console.info(element)
+        }
+        // console.log($('#header1'))
+        // arg.forEach( function(item) {
+        //     console.log(item)
+        // })
+    }
+
     header(p = {}) {
+        alert('header')
+        // this.isArgumentsAppend(arguments)
         this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
@@ -227,6 +244,7 @@ console.info(typeof p.appendId)
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
+        this.isArgumentsAppend(arguments)
         return this.component.attr.id
     }
 
@@ -250,6 +268,13 @@ console.info(typeof p.appendId)
     }
 
     button(p = {}) {
+        alert('button')
+        console.info('>>>',this.bufferAppendId)
+        // if (this.caller == null) {
+        //     console.log('The function was called from the top!');
+        //   } else {
+        //     console.log('This function\'s caller was ' + this.caller);
+        //   }
         this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
