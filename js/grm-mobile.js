@@ -39,7 +39,6 @@ class Mobile {
         this.itens = [];
         this.component = {};
         this.arrInfo = [];
-        this.appendId = "";
     }
 // 
     setInfo(nameComponent, id, tip) {
@@ -55,9 +54,9 @@ class Mobile {
         console.table(this.arrInfo)
     }
 
-    addAppend(component, nameComponent) {
-        this.appends[nameComponent] = component;
-    }
+    // addAppend(component, nameComponent) {
+    //     this.appends[nameComponent] = component;
+    // }
 
     // append(nameComponent) {
     //     this.append = this.appends[nameComponent]
@@ -105,7 +104,8 @@ class Mobile {
     }
 
     isDemo() {
-        this.component.demo = Object.keys(this.component.attr)[0] == undefined;
+        this.component.demo = arguments[0] == undefined;
+        // this.component.demo = Object.keys(this.component.attr)[0] == undefined;
     }
 
     setPageId() {
@@ -124,30 +124,26 @@ class Mobile {
             jQuery(`#${this.pageId}`).trigger('pagecreate');
     }
 
-    setAppendId(id) {
-        console.log('--->', id||this.pageId);
-        this.appendId = id||this.pageId;
-    }
-
     appendHtml() {
-        const destin = $(`#${this.appendId}`);
+        const p = this.component.attr
+        const destin = $(`#${p.appendId}`);
         // nome do componente
-        if (['page'].indexOf(this.component.name) >= 0) {
+        if (['page'].exist(this.component.name)) {
             $('body').append(this.html)
 
-        } else if (['header', 'panel'].indexOf(this.component.name) >= 0) {
+        } else if (['header', 'panel'].exist(this.component.name)) {
             destin.prepend(this.html)
 
-        } else if (['footer'].indexOf(this.component.name) >= 0) {
+        } else if (['footer'].exist(this.component.name)) {
             destin.append(this.html)
             
         } else {
             // nome do destino
-            if(this.appendId.indexOf('header') >= 0 )
+            if(p.appendId.indexOf('header') >= 0 )
                 destin.append(this.html)
-            if(this.appendId.indexOf('footer') >= 0 )
+            if(p.appendId.indexOf('footer') >= 0 )
                 destin.append(this.html)
-            if(this.appendId.indexOf('page') >= 0 )
+            if(p.appendId.indexOf('page') >= 0 )
                 destin.find('div[data-role=content]').append(this.html)
         }
         this.setInfo()
@@ -169,47 +165,47 @@ class Mobile {
     createPropriesIfNull(arr) {
         const p = this.component.attr;
         const id = this.createID();
-        // this.setPropertyToDemo(p, nameComponent, index);
-
+        arr.push('id', 'theme', 'appendId')
         if (!p.id && arr.exist('id')) p.id = id;
+        if (!p.text && arr.exist('text')) p.text = this.component.name.capitalize();
         if (!p.href && arr.exist('href')) p.href = '#';
         if (!p.type && arr.exist('type')) p.type = 'text';
         if (!p.theme && arr.exist('theme')) p.theme = this.theme;
         if (!p.reverse && arr.exist('reverse')) p.reverse = '#';
-        // if (!p.newWindow && arr.exist('newWindow')) p.newWindow = '_blank';
+        if (!p.appendId && arr.exist('appendId')) p.appendId = this.pageId;
         if (!p.transition && arr.exist('transition')) p.transition = 'flow';
         if (!p.placeholder && arr.exist('placeholder')) p.placeholder = 'Digite aqui';
+        // if (!p.newWindow && arr.exist('newWindow')) p.newWindow = '_blank';
     }
 
 
     page(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
-        this.createPropriesIfNull(['id', 'theme', 'reverse', 'newWindow', 'rel', 'transition', 'href'])
+        this.createPropriesIfNull(['reverse', 'newWindow', 'rel', 'transition', 'href'])
         var p = this.component.attr;
         this.html += `
-    <div placeholder="${p.placeholder}" data-role="page" id="${p.id}" class="${p.class}" data-control-title="${p.title || p.id}" data-theme="${p.theme}" >
-    <div data-role="content">`
+        <div placeholder="${p.placeholder}" data-role="page" id="${p.id}" class="${p.class}"
+         data-control-title="${p.title || p.id}" data-theme="${p.theme}" >
+        <div data-role="content">`
         this.removePropriesIfUndefined()
         this.setPageId()
-        this.setAppendId()
         this.appendHtml();
         return this.component.attr.id
     }
 
     header(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <div data-role="header" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}" >
-        <h1>${p.text || '&nbsp;'}</h1>
-        <a href="#info" data-rel="popup" class="ui-btn ui-btn-icon-notext ui-icon-info ui-btn-b ui-corner-all ui-btn-right"></a>
-     </div>`
+        <div data-role="header" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}">
+            <h1>${p.text || '&nbsp;'}</h1>
+        </div>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -217,16 +213,17 @@ class Mobile {
     }
 
     footer(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <div data-role="footer" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}" data-position="fixed" >
-        <h1>${p.text || '&nbsp;'}</h1>
-     </div>`
+        <div data-role="footer" id="${p.id}" class="${p.class}" data-theme="${p.theme || this.theme}" 
+         data-position="fixed" >
+            <h1>${p.text || '&nbsp;'}</h1>
+        </div>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -234,17 +231,19 @@ class Mobile {
     }
 
     button(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme', 'reverse', 'newWindow', 'rel', 'transition', 'href'])
+        this.createPropriesIfNull(['reverse', 'newWindow', 'rel', 'transition', 'href'])
         var p = this.component.attr;
+        if(!p.text) p.iconPosition = "notext";
         this.html += `
-    <a data-role="button" id="${p.id}" class="${p.class}" data-theme="${p.theme}" target="${p.newWindow}"
-      data-inline="${p.line}" data-direction="${p.reverse}" data-rel="${p.rel}" data-icon="${p.icon}" 
-      data-iconpos="${p.iconpos}" data-transition="${p.transition}" href="${p.href}">${p.text || '&nbsp;'}
-     </a>`
+        <a data-role="button" id="${p.id}" class="${p.class}" data-theme="${p.theme}"
+         target="${p.newWindow}" data-inline="${p.line}" data-direction="${p.reverse}" 
+         data-rel="${p.rel}" data-icon="${p.icon}" data-iconpos="${p.iconPosition}" 
+         data-transition="${p.transition}" href="${p.href}">${p.text || '&nbsp;'}
+        </a>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -252,16 +251,17 @@ class Mobile {
     }
 
     textInput(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme', 'type', 'placeholder'])
+        this.createPropriesIfNull(['type', 'placeholder'])
         var p = this.component.attr;
         this.html += `
-    <div data-role="fieldcontain" data-controltype="textinput" class="${p.class}">
-        ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
-        <input name="${p.name}" id="${p.id}" placeholder="${p.placeholder}" value="${p.value}" type="${p.type}">`
+        <div data-role="fieldcontain" data-controltype="textinput" class="${p.class}">
+            ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
+        <input name="${p.name}" id="${p.id}" placeholder="${p.placeholder}" value="${p.value}"
+         type="${p.type}">`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -269,14 +269,14 @@ class Mobile {
     }
 
     heading(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme', 'text'])
+        this.createPropriesIfNull(['text'])
         var p = this.component.attr;
         this.html += `
-    <h${p.size || 1} id="${p.id}" class="${p.class}">${p.text}</h${p.size || 1}>`
+        <h${p.size || 1} id="${p.id}" class="${p.class}">${p.text}</h${p.size || 1}>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -284,17 +284,17 @@ class Mobile {
     }
 
     youTube(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <iframe align="middle" data-controltype="youtube" id="${p.id}" type="text/html" width="${p.width || "100%"}"
-      height="${p.height || "216px"}" src="https://www.youtube.com/embed/${p.code || "C0DPdy98e4c"}" frameborder="0"
-      class="${p.class}">
-    </iframe>`
+        <iframe align="middle" data-controltype="youtube" id="${p.id}" type="text/html"
+         width="${p.width || "100%"}" height="${p.height || "216px"}" 
+         src="https://www.youtube.com/embed/${p.code || "C0DPdy98e4c"}" frameborder="0" class="${p.class}">
+        </iframe>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -302,17 +302,17 @@ class Mobile {
     }
 
     vimeo(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <iframe align="middle" data-controltype="vimeo" id="${p.id}" type="text/html" width="${p.width || "100%"}"
-      height="${p.height || "216px"}" src="https://player.vimeo.com/video/${p.code || "219747427"}" frameborder="0"
-      class="${p.class}">
-    </iframe>`
+        <iframe align="middle" data-controltype="vimeo" id="${p.id}" type="text/html"
+         width="${p.width || "100%"}" height="${p.height || "216px"}"
+         src="https://player.vimeo.com/video/${p.code || "219747427"}" frameborder="0" class="${p.class}">
+        </iframe>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -320,35 +320,37 @@ class Mobile {
     }
 
     image(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <a href="${p.href || "#"}" data-controltype="image" target="${p.newWindow}" id="${p.id}" class="${p.class}" >
-        <div style="width: 288px; height: 200px; position: 'relative'; background-color: #fbfbfb; border: 1px solid #b8b8b8;">
-            <img src=${p.src || "https://codiqa.com/static/images/v2/image.png"} alt="image"}
-             style="position: absolute; top: 50%; left: 50%; margin-left: -16px; margin-top: -18px">
-        </div>
-    </a>`
+        <a href="${p.href || "#"}" data-controltype="image" target="${p.newWindow}" id="${p.id}"
+         class="${p.class}" >
+            <div style="width: 288px; height: 200px; position: 'relative'; background-color: #fbfbfb; 
+             border: 1px solid #b8b8b8;">
+                <img src=${p.src || "https://codiqa.com/static/images/v2/image.png"} alt="image"}
+                style="position: absolute; top: 50%; left: 50%; margin-left: -16px; margin-top: -18px">
+            </div>
+        </a>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
         return this.component.attr.id
     }
-
+    
     link(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme', 'newWindow', 'href'])
+        this.createPropriesIfNull(['newWindow', 'href'])
         var p = this.component.attr;
         this.html += `
-    <a id="${p.id}" class="${p.class}" target="${p.newWindow}" data-transition="${p.transition}" 
-     href="${p.href}">${p.text || Link}</a>`
+        <a id="${p.id}" class="${p.class}" target="${p.newWindow}" data-transition="${p.transition}" 
+         href="${p.href}">${p.text || Link}</a>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -356,18 +358,18 @@ class Mobile {
     }
 
     slider(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <div data-role="fieldcontain" data-controltype="slider" class="${p.class}">
-        ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
-        <input id="${p.id}" type="range" name="${p.name}" value="${p.value || 50}" min="${p.valueMin || 0}" 
-         max="${p.valueMax || 100}" data-highlight="${p.highlight}" data-mini="${p.mini}" data-theme="${p.theme}"
-         data-track-theme="${p.trackTheme || this.theme}">`
+        <div data-role="fieldcontain" data-controltype="slider" class="${p.class}">
+            ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
+            <input id="${p.id}" type="range" name="${p.name}" value="${p.value || 50}"
+             min="${p.valueMin || 0}" max="${p.valueMax || 100}" data-highlight="${p.highlight}"
+             data-mini="${p.mini}" data-theme="${p.theme}" data-track-theme="${p.trackTheme || this.theme}">`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -375,18 +377,19 @@ class Mobile {
     }
 
     toggleSwitch(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         var p = this.component.attr;
         this.html += `
-    <div data-role="fieldcontain" data-controltype="toggleswitch" class="${p.class}" >
-        ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
-        <select name="${p.name || p.id}" id="${p.id}" data-theme="${p.theme}" data-role="slider" data-mini="${p.mini}">
-            <option value="off">${p.textOff || "off"}</option>
-            <option value="on">${p.textOn || "on"}</option>`
+        <div data-role="fieldcontain" data-controltype="toggleswitch" class="${p.class}" >
+            ${p.title ? `<label for="${p.id}">${p.title}</label>` : ''}
+            <select name="${p.name || p.id}" id="${p.id}" data-theme="${p.theme}" data-role="slider"
+             data-mini="${p.mini}">
+                <option value="off">${p.textOff || "off"}</option>
+                <option value="on">${p.textOn || "on"}</option>`
         this.removePropriesIfUndefined()
         this.appendHtml();
         this.renderPage();    
@@ -411,24 +414,25 @@ class Mobile {
     }
 
     checkBoxes(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         this.addItensIfItensNull()
         var p = this.component.attr;
         this.html += `
-    <div id="${p.id}" data-role="fieldcontain" data-controltype="checkboxes">
-        <fieldset data-role="controlgroup" data-type="${p.orientation || 'vertical'}" data-mini="${p.mini}">
-        ${p.title ? `<legend>${p.title}</legend>` : ''}`
+        <div id="${p.id}" data-role="fieldcontain" data-controltype="checkboxes">
+            <fieldset data-role="controlgroup" data-type="${p.orientation || 'vertical'}"
+             data-mini="${p.mini}">
+            ${p.title ? `<legend>${p.title}</legend>` : ''}`
 
         this.itens.forEach((item, index) => {
             index++
             this.html += `
-        <input  id="${p.id}-item${index}" name="${item.name || "Item " + index}" data-theme="${item.theme || this.theme}" 
-         type="checkbox">
-        <label for="${p.id}-item${index}">${item.text || "Item " + index}</label>`
+            <input  id="${p.id}-item${index}" name="${item.name || "Item " + index}"
+            data-theme="${item.theme || this.theme}" type="checkbox">
+            <label for="${p.id}-item${index}">${item.text || "Item " + index}</label>`
         })
         this.clearItens();
         this.removePropriesIfUndefined();
@@ -438,23 +442,23 @@ class Mobile {
     }
 
     radioButtons(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         this.addItensIfItensNull()
         var p = this.component.attr;
         this.html += `
-    <div id="${p.id}" data-role="fieldcontain" data-controltype="radiobuttons">
-        <fieldset data-role="controlgroup" data-type="${p.orientation || 'vertical'}" data-mini="${p.mini}">
-        ${p.title ? `<legend>${p.title}</legend>` : ''}`
+        <div id="${p.id}" data-role="fieldcontain" data-controltype="radiobuttons">
+            <fieldset data-role="controlgroup" data-type="${p.orientation || 'vertical'}" data-mini="${p.mini}">
+            ${p.title ? `<legend>${p.title}</legend>` : ''}`
 
         this.itens.forEach((item, index) => {
             index++
             this.html += `
-        <input  id="${p.id}-item${index}" name="${p.id}" data-theme="${item.theme || this.theme}" type="radio">
-        <label for="${p.id}-item${index}">${item.text || "Item " + index}</label>`
+            <input  id="${p.id}-item${index}" name="${p.id}" data-theme="${item.theme || this.theme}" type="radio">
+            <label for="${p.id}-item${index}">${item.text || "Item " + index}</label>`
         })
         this.clearItens();
         this.removePropriesIfUndefined()
@@ -464,23 +468,23 @@ class Mobile {
     }
 
     selectMenu(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         this.addItensIfItensNull()
         var p = this.component.attr;
         this.html += `
-    <div data-role="fieldcontain" data-controltype="selectmenu" class="${p.class}">
-        ${p.title ? `<label for="${p.id}" >${p.title}</label>` : ''}  
-        <select id="${p.id}" data-native-menu="${p.native || false}" name="${p.name}" 
-         data-theme="${p.theme}" data-mini="${p.mini}">`
+        <div data-role="fieldcontain" data-controltype="selectmenu" class="${p.class}">
+            ${p.title ? `<label for="${p.id}" >${p.title}</label>` : ''}  
+            <select id="${p.id}" data-native-menu="${p.native || false}" name="${p.name}" 
+            data-theme="${p.theme}" data-mini="${p.mini}">`
 
         this.itens.forEach((item, index) => {
             index++
             this.html += `
-        <option value="${p.value || index}">${item.text || "Item " + index}</option>`
+            <option value="${p.value || index}">${item.text || "Item " + index}</option>`
         })
         this.clearItens();
         this.removePropriesIfUndefined()
@@ -490,23 +494,23 @@ class Mobile {
     }
 
     collapsible(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         this.addItensIfItensNull()
         var p = this.component.attr;
         this.html += `
-    <div id="${p.id}" data-role="collapsible-set" data-theme="${p.theme}" 
-      data-content-theme="${p.themeContent || this.theme}" class="${p.class}">`
+        <div id="${p.id}" data-role="collapsible-set" data-theme="${p.theme}" 
+         data-content-theme="${p.themeContent || this.theme}" class="${p.class}">`
 
         this.itens.forEach((item, index) => {
             index++
             this.html += `
-        <div id="${p.id}-item${index}" data-role="collapsible" data-collapsed="${item.collapsed || true}">
-            <h3>${item.text || "Item " + index}</h3>
-        </div>`
+            <div id="${p.id}-item${index}" data-role="collapsible" data-collapsed="${item.collapsed || true}">
+                <h3>${item.text || "Item " + index}</h3>
+            </div>`
         })
         this.clearItens();
         this.removePropriesIfUndefined()
@@ -516,27 +520,27 @@ class Mobile {
     }
 
     listView(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         this.addItensIfItensNull()
         var p = this.component.attr;
         this.html += `
-    <ul id="${p.id}" data-role="listview" data-divider-theme="${p.themeDivider || this.theme}" 
-      data-inset="${(!!p.inset) || true}" class="${p.class}">`
+        <ul id="${p.id}" data-role="listview" data-divider-theme="${p.themeDivider || this.theme}" 
+        data-inset="${(!!p.inset) || true}" class="${p.class}">`
 
         this.itens.forEach((item, index) => {
             if (this.component.demo) item.bubble = Math.floor((Math.random() * 200) + 1);
             index++
             this.html += `
-        <li data-theme="${item.theme || this.theme}">
-            ${ !item.readOnly ? `<a href="${item.href || "#"}" data-transition="${item.transition}">` : ''}
-                ${item.text || "Item " + index}
-                ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
-            ${ !item.readOnly ? '</a>' : ''}
-        </li>`
+            <li data-theme="${item.theme || this.theme}">
+                ${ !item.readOnly ? `<a href="${item.href || "#"}" data-transition="${item.transition}">` : ''}
+                    ${item.text || "Item " + index}
+                    ${item.bubble ? `<span class="ui-li-count">${item.bubble}</span>` : ''}
+                ${ !item.readOnly ? '</a>' : ''}
+            </li>`
         })
         this.clearItens();
         this.removePropriesIfUndefined()
@@ -546,20 +550,20 @@ class Mobile {
     }
 
     panel(p = {}) {
+        this.isDemo(arguments[0])
         this.newComponent(p)
         this.setNameComponent()
-        this.isDemo()
         this.createPropriesIfDemo()
-        this.createPropriesIfNull(['id', 'theme'])
+        this.createPropriesIfNull([])
         this.addItensIfItensNull()
         var p = this.component.attr;
         this.html += `
-    <div data-role="panel" id="panel1" data-position="left" data-display="reveal" data-theme="a">
-        <ul data-role="listview" data-divider-theme="h" data-inset="false">
-            <li data-role="list-divider" role="heading">Divider</li>
-            <li data-theme="a"><a href="" data-transition="slide">Button</a></li>
-        </ul>
-    </div>`
+        <div data-role="panel" id="panel1" data-position="left" data-display="reveal" data-theme="a">
+            <ul data-role="listview" data-divider-theme="h" data-inset="false">
+                <li data-role="list-divider" role="heading">Divider</li>
+                <li data-theme="a"><a href="" data-transition="slide">Button</a></li>
+            </ul>
+        </div>`
 
         this.itens.forEach((item, index) => {
             if (this.component.demo) item.bubble = Math.floor((Math.random() * 200) + 1);
